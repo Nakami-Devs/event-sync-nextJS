@@ -11,3 +11,81 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model Speaker {
+  id             String           @id @default(uuid())
+  full_name      String
+  profile_pic    String
+  biography      String
+  external_links String
+  sessions       SessionSpeaker[]
+
+  @@map("speaker")
+}
+
+model Admin {
+  id       String @id @default(uuid())
+  email    String @unique
+  password String
+
+  @@map("admin")
+}
+
+model Event {
+  id          String    @id @default(uuid())
+  title       String
+  description String
+  start_date  DateTime
+  end_date    DateTime
+  place       String
+  sessions    Session[]
+
+  @@map("event")
+}
+
+model Room {
+  id       String    @id @default(uuid())
+  name     String
+  capacity String
+  sessions Session[]
+
+  @@map("room")
+}
+
+model Session {
+  id          String           @id @default(uuid())
+  title       String
+  description String
+  start_time  DateTime
+  end_time    DateTime
+  id_event    String
+  id_room     String
+  event       Event            @relation(fields: [id_event], references: [id])
+  room        Room             @relation(fields: [id_room], references: [id])
+  speakers    SessionSpeaker[]
+  questions   Question[]
+
+  @@map("session")
+}
+
+model Question {
+  id                String   @id @default(uuid())
+  content           String
+  name              String   @default("ANONYM")
+  upvote_numbers    Int      @default(0)
+  creation_datetime DateTime @default(now())
+  id_session        String
+  session           Session  @relation(fields: [id_session], references: [id])
+
+  @@map("question")
+}
+
+model SessionSpeaker {
+  id         String
+  id_session String
+  speaker    Speaker @relation(fields: [id], references: [id])
+  session    Session @relation(fields: [id_session], references: [id])
+
+  @@id([id, id_session])
+  @@map("session_speaker")
+}
