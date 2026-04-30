@@ -3,11 +3,9 @@ import { prisma } from '@/lib/prisma'
 
 export async function POST(request: NextRequest) {
   try {
-    // On lit le corps JSON de la requête
     const body = await request.json()
     const { title, description, start_time, end_time, id_event, id_room, speaker_ids } = body
 
-    // Validation des champs obligatoires
     if (!title || !description || !start_time || !end_time || !id_event || !id_room) {
       return NextResponse.json(
         { error: 'Champs obligatoires manquants : title, description, start_time, end_time, id_event, id_room' },
@@ -19,11 +17,10 @@ export async function POST(request: NextRequest) {
       data: {
         title,
         description,
-        start_time: new Date(start_time),   // on convertit la string ISO en Date
+        start_time: new Date(start_time),   
         end_time:   new Date(end_time),
         id_event,
         id_room,
-        // Si speaker_ids est fourni, on crée les liaisons SessionSpeaker
         speakers: {
           create: (speaker_ids ?? []).map((id: string) => ({ id }))
         }
