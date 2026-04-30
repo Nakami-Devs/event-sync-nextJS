@@ -60,7 +60,7 @@ export async function GET(
     })
   } catch (error) {
     return NextResponse.json(
-      { success: false, error: 'Erreur lors de la récupération du planning' },
+      { success: false, error: 'Error retrieving planning' },
       { status: 500 }
     )
   }
