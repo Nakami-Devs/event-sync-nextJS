@@ -3,11 +3,11 @@ import { prisma } from '@/lib/prisma'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }  
 ) {
   try {
-    const { id } = params
-    const body  = await request.json()
+    const { id } = await params  
+    const body = await request.json()
     const { title, description, start_time, end_time, id_event, id_room } = body
 
     const existing = await prisma.session.findUnique({ where: { id } })
@@ -42,10 +42,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }  
 ) {
   try {
-    const { id } = params
+    const { id } = await params  
 
     const existing = await prisma.session.findUnique({ where: { id } })
     if (!existing) {

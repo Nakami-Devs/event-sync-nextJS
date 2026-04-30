@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { Session } from '@/generated/prisma/client'
-
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }  
 ) {
   try {
-    const { id } = params
-
+    const { id } = await params  
     const room = await prisma.room.findUnique({ where: { id } })
     if (!room) {
       return NextResponse.json({ error: 'Salle introuvable' }, { status: 404 })
@@ -25,7 +22,7 @@ export async function GET(
     })
 
     const now = new Date()
-    const sessionsWithLive = sessions.map((session: Session) => ({
+    const sessionsWithLive = sessions.map((session) => ({
       ...session,
       is_live: now >= session.start_time && now <= session.end_time
     }))
