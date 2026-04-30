@@ -65,7 +65,7 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     return NextResponse.json(
-      { success: false, error: 'Erreur lors de la détection des sessions live' },
+      { success: false, error: 'Error detecting live sessions' },
       { status: 500 }
     )
   }
