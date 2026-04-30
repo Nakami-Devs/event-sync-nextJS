@@ -25,7 +25,7 @@ export async function GET(
     
     if (!event) {
       return NextResponse.json(
-        { success: false, error: 'Événement non trouvé' },
+        { success: false, error: 'Event not found' },
         { status: 404 }
       )
     }
@@ -45,7 +45,7 @@ export async function GET(
     })
   } catch (error) {
     return NextResponse.json(
-      { success: false, error: 'Erreur lors de la récupération de l\'événement' },
+      { success: false, error: 'Error while retrieving event' },
       { status: 500 }
     )
   }
