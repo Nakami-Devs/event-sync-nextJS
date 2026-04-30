@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import createPrismaClient from '@/lib/prisma/client';
 
-// GET /api/events - Liste tous les événements
 export async function GET() {
   try {
     const prisma = createPrismaClient();
@@ -23,15 +22,14 @@ export async function GET() {
 
     return NextResponse.json(events);
   } catch (error) {
-    console.error('Erreur lors de la récupération des événements:', error);
+    console.error('Error retrieving events:', error);
     return NextResponse.json(
-      { error: 'Erreur lors de la récupération des événements' },
+      { error: 'Error retrieving events' },
       { status: 500 }
     );
   }
 }
 
-// POST /api/events - Créer un nouvel événement
 export async function POST(request: Request) {
   try {
     const prisma = createPrismaClient();
@@ -40,7 +38,7 @@ export async function POST(request: Request) {
 
     if (!title || !description || !startDate || !endDate || !location) {
       return NextResponse.json(
-        { error: 'Tous les champs sont requis' },
+        { error: 'All fields are required' },
         { status: 400 }
       );
     }
@@ -57,9 +55,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json(event, { status: 201 });
   } catch (error) {
-    console.error('Erreur lors de la création de l\'événement:', error);
+    console.error('Error creating the event', error);
     return NextResponse.json(
-      { error: 'Erreur lors de la création de l\'événement' },
+      { error: 'Error creating the event' },
       { status: 500 }
     );
   }

@@ -38,7 +38,7 @@ export async function GET(
     
     if (!speaker) {
       return NextResponse.json(
-        { success: false, error: 'Intervenant non trouvé' },
+        { success: false, error: 'Speaker not found' },
         { status: 404 }
       )
     }
@@ -93,7 +93,7 @@ export async function GET(
     })
   } catch (error) {
     return NextResponse.json(
-      { success: false, error: 'Erreur lors de la récupération de l\'intervenant' },
+      { success: false, error: 'Error while retrieving speaker' },
       { status: 500 }
     )
   }
