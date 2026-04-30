@@ -38,7 +38,7 @@ export async function GET(
     
     if (!speaker) {
       return NextResponse.json(
-        { success: false, error: 'Intervenant non trouvé' },
+        { success: false, error: 'Speaker not found' },
         { status: 404 }
       )
     }
