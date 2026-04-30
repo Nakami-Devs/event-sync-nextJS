@@ -1,40 +1,64 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { NextResponse } from 'next/server';
+import createPrismaClient from '@/lib/prisma/client';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(request.url)
-    const upcoming = searchParams.get('upcoming') === 'true'
-    
-    const where = upcoming ? {
-      endDate: {
-        gte: new Date()
-      }
-    } : {}
-    
+    const prisma = createPrismaClient();
     const events = await prisma.event.findMany({
-      where,
       include: {
         sessions: {
           include: {
-            speakers: true
-          }
+            room: true,
+            speakers: true,
+            _count: {
+              select: { questions: true }
+            }
+          },
+          orderBy: { startTime: 'asc' }
         }
       },
-      orderBy: {
-        startDate: 'asc'
-      }
-    })
-    
-    return NextResponse.json({
-      success: true,
-      data: events,
-      count: events.length
-    })
+      orderBy: { startDate: 'asc' }
+    });
+
+    return NextResponse.json(events);
   } catch (error) {
+    console.error('Error retrieving events:', error);
     return NextResponse.json(
-      { success: false, error: 'Error while retrieving events' },
+      { error: 'Error retrieving events' },
       { status: 500 }
-    )
+    );
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const prisma = createPrismaClient();
+    const body = await request.json();
+    const { title, description, startDate, endDate, location } = body;
+
+    if (!title || !description || !startDate || !endDate || !location) {
+      return NextResponse.json(
+        { error: 'All fields are required' },
+        { status: 400 }
+      );
+    }
+
+    const event = await prisma.event.create({
+      data: {
+        title,
+        description,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        location
+      }
+    });
+
+    return NextResponse.json(event, { status: 201 });
+  } catch (error) {
+    console.error('Error creating the event', error);
+    return NextResponse.json(
+      { error: 'Error creating the event' },
+      { status: 500 }
+    );
   }
 }
