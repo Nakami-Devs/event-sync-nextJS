@@ -70,3 +70,34 @@ export async function PUT(req: NextRequest, { params }: Params){
         )
     }
 }
+
+export async function DELETE(_req: NextRequest, { params }: Params){
+    try{
+        const existing = await prisma.event.findUnique({
+            where: { id: params.id }
+        })
+
+        if(!existing){
+            return NextResponse.json(
+                { message: 'Event not found'},
+                { status: 404 }
+            )
+        }
+
+        await prisma.event.delete({
+            where: { id: params.id }
+        })
+
+
+        return NextResponse.json(
+            { message: 'Event deleted successfully' },
+            { status: 200 }
+        )
+    } catch(error){
+        console.error('Error deleting event', error)
+        return NextResponse.json(
+            { message: 'Server error' },
+            { status: 500 }
+        )
+    }
+}
