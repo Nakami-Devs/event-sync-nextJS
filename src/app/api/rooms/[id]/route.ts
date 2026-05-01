@@ -57,3 +57,30 @@ export async function PUT(req: NextRequest, { params }: Params) {
         )
     }
 }
+
+export async function DELETE(_req: NextRequest, { params }: Params) {
+    try {
+        const existing = await prisma.room.findUnique({
+            where: { id: params.roomId }
+        })
+
+        if (!existing) {
+            return NextResponse.json(
+                { message: 'Room not found' },
+                { status: 404 }
+            )
+        }
+
+        await prisma.room.delete({ where: { id: params.roomId } })
+
+        return NextResponse.json(
+            { message: 'Room deleted successfully' },
+            { status: 200 }
+        )
+    } catch (error) {
+        return NextResponse.json(
+            { message: 'Server error' },
+            { status: 500 }
+        )
+    }
+}
