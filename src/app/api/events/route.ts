@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import createPrismaClient from '@/lib/prisma/client';
+import {NextRequest, NextResponse} from 'next/server';
+import {createPrismaClient} from "@/lib/prisma";
 
 export async function GET() {
   try {
@@ -14,10 +14,10 @@ export async function GET() {
               select: { questions: true }
             }
           },
-          orderBy: { startTime: 'asc' }
+          orderBy: { start_time: 'asc' }
         }
       },
-      orderBy: { startDate: 'asc' }
+      orderBy: { start_date: 'asc' }
     });
 
     return NextResponse.json(events);
@@ -30,26 +30,33 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const prisma = createPrismaClient();
     const body = await request.json();
-    const { title, description, startDate, endDate, location } = body;
+    const { title, description, start_date, end_date, place } = body;
 
-    if (!title || !description || !startDate || !endDate || !location) {
+    if (!title || !description || !start_date || !end_date || !place) {
       return NextResponse.json(
         { error: 'All fields are required' },
         { status: 400 }
       );
     }
 
+    if (new Date(start_date) >= new Date(end_date)) {
+      return NextResponse.json(
+          { message: 'Start date should be before the end date' },
+          { status: 400 }
+      )
+    }
+
     const event = await prisma.event.create({
       data: {
         title,
         description,
-        startDate: new Date(startDate),
-        endDate: new Date(endDate),
-        location
+        start_date: new Date(start_date),
+        end_date: new Date(end_date),
+        place
       }
     });
 

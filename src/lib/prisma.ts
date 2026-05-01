@@ -6,7 +6,7 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-function createPrismaClient() {
+export function createPrismaClient() {
   const pool = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
   });
