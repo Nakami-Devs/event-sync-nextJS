@@ -89,3 +89,5 @@ model SessionSpeaker {
   @@id([id, id_session])
   @@map("session_speaker")
 }
+
+
