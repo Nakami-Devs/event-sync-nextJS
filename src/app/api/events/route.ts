@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import createPrismaClient from '@/lib/prisma/client';
+import {createPrismaClient} from "@/lib/prisma";
 
 export async function GET() {
   try {
@@ -14,10 +14,10 @@ export async function GET() {
               select: { questions: true }
             }
           },
-          orderBy: { startTime: 'asc' }
+          orderBy: { start_time: 'asc' }
         }
       },
-      orderBy: { startDate: 'asc' }
+      orderBy: { start_date: 'asc' }
     });
 
     return NextResponse.json(events);
