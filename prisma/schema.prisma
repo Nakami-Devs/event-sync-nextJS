@@ -81,13 +81,11 @@ model Question {
 }
 
 model SessionSpeaker {
-  id         String
+  id_speaker String
   id_session String
-  speaker    Speaker @relation(fields: [id], references: [id])
+  speaker    Speaker @relation(fields: [id_speaker], references: [id])
   session    Session @relation(fields: [id_session], references: [id])
 
-  @@id([id, id_session])
+  @@id([id_speaker, id_session])
   @@map("session_speaker")
 }
-
-
