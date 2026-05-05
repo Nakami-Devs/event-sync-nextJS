@@ -1,5 +1,7 @@
 import {NextRequest, NextResponse} from 'next/server';
-import {signIn} from "@/lib/auth";
+import {prisma} from "@/lib/prisma";
+import {generateToken} from "@/lib/token";
+import bcrypt from "bcryptjs";
 
 export async function POST (req: NextRequest){
     try{
@@ -7,22 +9,48 @@ export async function POST (req: NextRequest){
 
         if(!email || !password){
             return NextResponse.json(
-                { message: 'Email and password are required'},
+                { message: 'L\'email et le mot de passe sont requis'},
                 { status: 400 }
             )
         }
 
-        await signIn('credentials', { email, password, redirect: false})
+        const admin = await prisma.admin.findUnique({
+            where: { email },
+        })
 
+
+        if (!admin) {
+            return NextResponse.json(
+                { message: 'Aucun admin trouvé avec cet email' },
+                { status: 404 }
+            )
+        }
+
+        const passwordMatch = await bcrypt.compare(password, admin.password)
+        if(!passwordMatch){
+            return NextResponse.json(
+                { message: 'Mot de passe incorrect' },
+                { status: 401 }
+            )
+        }
+
+        const token = await generateToken({ id: admin.id, email: admin.email })
         return NextResponse.json(
-            { message: 'Signed in successfully'},
+            {
+                message: 'Connexion réussie',
+                admin: {
+                    id: admin.id,
+                    email: admin.email,
+                },
+                token,
+            },
             { status: 200 }
         )
 
     } catch(error){
         return NextResponse.json(
-            { message: 'Incorrect email or password'},
-            { status: 401 }
+            { message: 'Erreur interne du serveur'},
+            { status: 500 }
         )
     }
 }
