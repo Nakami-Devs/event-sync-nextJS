@@ -1,6 +1,7 @@
 import {NextRequest, NextResponse} from 'next/server';
 import {prisma} from "@/lib/prisma";
 import {generateToken} from "@/lib/token";
+import bcrypt from "bcryptjs";
 
 export async function POST (req: NextRequest){
     try{
@@ -20,7 +21,15 @@ export async function POST (req: NextRequest){
 
         if (!admin) {
             return NextResponse.json(
-                { message: 'Email ou mot de passe incorrect' },
+                { message: 'Aucun admin trouvé avec cet email' },
+                { status: 404 }
+            )
+        }
+
+        const passwordMatch = await bcrypt.compare(password, admin.password)
+        if(!passwordMatch){
+            return NextResponse.json(
+                { message: 'Mot de passe incorrect' },
                 { status: 401 }
             )
         }
