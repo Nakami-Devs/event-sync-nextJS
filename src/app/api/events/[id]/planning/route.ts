@@ -1,3 +1,6 @@
+import {NextRequest, NextResponse} from "next/server";
+import {prisma} from "@/lib/prisma";
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
@@ -20,24 +23,24 @@ export async function GET(
         speakers: true
       },
       orderBy: [
-        { startTime: 'asc' },
-        { room: 'asc' }
+        { start_time: 'asc' },
+        { id_room: 'asc' }
       ]
     })
     
     const now = new Date()
     
     const planningByRoom = sessions.reduce((acc, session) => {
-      if (!acc[session.room]) {
-        acc[session.room] = []
+      if (!acc[session.id_room]) {
+        acc[session.id_room] = []
       }
       
-      const isLive = now >= new Date(session.startTime) && now <= new Date(session.endTime)
+      const isLive = now >= new Date(session.start_time) && now <= new Date(session.end_time)
       
-      acc[session.room].push({
+      acc[session.id_room].push({
         ...session,
         isLive,
-        timeSlot: `${new Date(session.startTime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} - ${new Date(session.endTime).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
+        timeSlot: `${new Date(session.start_time).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} - ${new Date(session.end_time).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`
       })
       
       return acc
