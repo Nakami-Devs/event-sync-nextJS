@@ -1,12 +1,14 @@
 import {NextRequest, NextResponse} from "next/server";
 import {prisma} from "@/lib/prisma";
 
-type Params = { params: { id: string}}
+type Params = Promise<{ id: string }>
 
-export async function GET(_req: NextRequest, { params }: Params){
+export async function GET(_req: NextRequest, { params }: {params: Params}){
+    const {id} = await params;
+
     try{
         const event = await prisma.event.findUnique({
-            where: {id: params.id},
+            where: {id},
             include: {
                 sessions: {
                     include: {
@@ -21,38 +23,40 @@ export async function GET(_req: NextRequest, { params }: Params){
 
         if(!event){
             return NextResponse.json(
-                { message: 'Event not found'},
+                { message: 'Événement non trouvé'},
                 { status: 404 }
             )
         }
 
         return NextResponse.json(event, {status: 200})
     } catch (error){
-        console.error('Error retrieving the event', error);
+        console.error('Erreur lors de la récupération de l\'événement', error);
         return NextResponse.json(
-            { message : 'Internal server error '},
+            { message : 'Erreur interne du serveur'},
             { status: 500 }
         )
     }
 }
 
-export async function PUT(req: NextRequest, { params }: Params){
+export async function PUT(req: NextRequest, { params }: {params: Params}){
+    const {id} = await params;
+
     try{
         const { title, description, start_date, end_date, place } = await req.json()
 
         const existing = await prisma.event.findUnique({
-            where: { id: params.id }
+            where: { id }
         })
 
         if(!existing){
             return NextResponse.json(
-                { message: 'Event not found'},
+                { message: 'Événement non trouvé'},
                 { status: 404 }
             )
         }
 
         const updated = await prisma.event.update({
-            where: { id: params.id },
+            where: { id },
             data: {
                 ...(title && {title}),
                 ...(description && {description}),
@@ -63,40 +67,42 @@ export async function PUT(req: NextRequest, { params }: Params){
         })
         return NextResponse.json(updated, { status: 200 })
     } catch (error){
-        console.error('Error updating event', error)
+        console.error('Erreur lors de la mise à jour de l\'événement', error)
         return NextResponse.json(
-            { message: 'Server error' },
+            { message: 'Erreur interne du serveur' },
             { status: 500 }
         )
     }
 }
 
-export async function DELETE(_req: NextRequest, { params }: Params){
+export async function DELETE(_req: NextRequest, { params }: {params: Params}){
+    const {id} = await params;
+
     try{
         const existing = await prisma.event.findUnique({
-            where: { id: params.id }
+            where: { id }
         })
 
         if(!existing){
             return NextResponse.json(
-                { message: 'Event not found'},
+                { message: 'Événement non trouvé'},
                 { status: 404 }
             )
         }
 
         await prisma.event.delete({
-            where: { id: params.id }
+            where: { id }
         })
 
 
         return NextResponse.json(
-            { message: 'Event deleted successfully' },
+            { message: 'Événement supprimé avec succès' },
             { status: 200 }
         )
     } catch(error){
-        console.error('Error deleting event', error)
+        console.error('Erreur lors de la suppression de l\'événement', error)
         return NextResponse.json(
-            { message: 'Server error' },
+            { message: 'Erreur interne du serveur' },
             { status: 500 }
         )
     }
