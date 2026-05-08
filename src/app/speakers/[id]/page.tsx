@@ -1,129 +1,168 @@
-import { notFound } from 'next/navigation';
-import PublicLayout from '@/components/PublicLayout';
-import { SPEAKERS, SESSIONS, isSessionLive } from '@/lib/mockData';
+import { notFound } from "next/navigation";
+import Link from "next/link";
 
-interface SpeakerPageProps {
-  params: Promise<{ id: string }>;
+import PublicLayout from "@/components/sections/PublicLayout";
+
+type SpeakerSession = {
+  id: string;
+  title: string;
+  description: string;
+  start_time: string;
+  end_time: string;
+  event: { id: string; title: string };
+  room: { name: string };
+};
+
+type SpeakerDetails = {
+  id: string;
+  full_name: string;
+  profile_pic: string;
+  biography: string;
+  externalLinks: Array<string | { title?: string; url?: string }>;
+  statistics: {
+    totalSessions: number;
+    totalQuestions: number;
+    totalUpvotes: number;
+    upcomingSessions: number;
+    pastSessions: number;
+  };
+  sessions: {
+    all: SpeakerSession[];
+  };
+};
+
+async function getSpeaker(id: string): Promise<SpeakerDetails | null> {
+  const res = await fetch(`/api/speakers/${id}`, { cache: "no-store" });
+  if (!res.ok) return null;
+  const payload = await res.json();
+  return payload?.data ?? null;
 }
 
-export default async function SpeakerPage({ params }: SpeakerPageProps) {
+function resolveLink(entry: string | { title?: string; url?: string }) {
+  if (typeof entry === "string") {
+    return { label: entry, url: entry };
+  }
+
+  return {
+    label: entry.title ?? entry.url ?? "Lien",
+    url: entry.url ?? entry.title ?? "#",
+  };
+}
+
+export default async function SpeakerPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const speaker = SPEAKERS?.find(s => s.id === id);
-  
-  if (!speaker) {
+  const speakerData = await getSpeaker(id);
+
+  if (!speakerData) {
     notFound();
   }
 
-  const sessions = SESSIONS?.filter(s => 
-    s.speakers.some(sp => sp.id === id)
-  ) || [];
+  const speaker = speakerData;
+  const links = Array.isArray(speaker.externalLinks) ? speaker.externalLinks : [];
+  const sessions = speaker.sessions?.all ?? [];
 
   return (
     <PublicLayout>
-      <div className="max-w-4xl mx-auto">
-        {}
-        <div className="flex flex-col sm:flex-row gap-6 mb-8">
-          <img
-            src={speaker.avatar}
-            alt={speaker.name}
-            className="w-32 h-32 rounded-full object-cover border-4 border-primary/20"
-          />
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold text-foreground">{speaker.name}</h1>
-            <p className="text-lg text-primary font-medium mt-1">
-              {speaker.title} @ {speaker.company}
-            </p>
-            <p className="text-muted-foreground mt-4">{speaker.bio}</p>
-            
-            {/* Liens externes */}
-            <div className="flex gap-3 mt-4">
-              {speaker.twitter && (
-                <a
-                  href={speaker.twitter}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.81zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-                  </svg>
-                </a>
-              )}
-              {speaker.linkedin && (
-                <a
-                  href={speaker.linkedin}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                  </svg>
-                </a>
-              )}
-              {speaker.website && (
-                <a
-                  href={speaker.website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
-                  </svg>
-                </a>
-              )}
+      <div className="space-y-10">
+        <section className="grid gap-8 rounded-3xl border border-white/10 bg-slate-900/80 p-8 shadow-xl shadow-slate-950/20 lg:grid-cols-[280px_1fr]">
+          <div className="space-y-6 text-center">
+            <img
+              src={speaker.profile_pic}
+              alt={speaker.full_name}
+              className="mx-auto h-40 w-40 rounded-full border border-white/10 object-cover"
+            />
+            <div>
+              <p className="text-sm uppercase tracking-[0.2em] text-purple-300/80">Intervenant</p>
+              <h1 className="mt-3 text-3xl font-semibold text-white">{speaker.full_name}</h1>
             </div>
           </div>
-        </div>
 
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-foreground">Sessions</h2>
-          
-          {sessions.length === 0 ? (
-            <p className="text-muted-foreground">Aucune session prévue pour cet intervenant.</p>
-          ) : (
-            sessions.map(session => {
-              const isLive = isSessionLive(session);
-              const startTime = new Date(session.startTime);
-              const timeFormat = new Intl.DateTimeFormat('fr-FR', {
-                weekday: 'short',
-                month: 'short',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-              });
+          <div className="space-y-6">
+            <div className="rounded-3xl bg-slate-950/80 p-6 text-slate-300">
+              <h2 className="text-xl font-semibold text-white">Bio</h2>
+              <p className="mt-4 leading-7 text-slate-400">{speaker.biography}</p>
+            </div>
 
-              return (
-                <a
-                  key={session.id}
-                  href={`/session-detail-page?id=${session.id}`}
-                  className="block p-4 bg-card border border-border rounded-lg hover:border-primary/50 transition-colors"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        {isLive && (
-                          <span className="text-xs font-semibold text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30 px-2 py-0.5 rounded-full flex items-center gap-1">
-                            <span className="w-1 h-1 rounded-full bg-red-500" />
-                            LIVE
-                          </span>
-                        )}
-                        <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                          {session.room.name}
-                        </span>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <div className="rounded-2xl bg-slate-950/80 p-4 text-sm text-slate-300">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Sessions</p>
+                <p className="mt-2 text-2xl font-semibold text-white">{speaker.statistics.totalSessions}</p>
+              </div>
+              <div className="rounded-2xl bg-slate-950/80 p-4 text-sm text-slate-300">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Questions</p>
+                <p className="mt-2 text-2xl font-semibold text-white">{speaker.statistics.totalQuestions}</p>
+              </div>
+              <div className="rounded-2xl bg-slate-950/80 p-4 text-sm text-slate-300">
+                <p className="text-xs uppercase tracking-[0.2em] text-slate-500">Upvotes</p>
+                <p className="mt-2 text-2xl font-semibold text-white">{speaker.statistics.totalUpvotes}</p>
+              </div>
+            </div>
+
+            {links.length > 0 && (
+              <div className="rounded-3xl bg-slate-950/80 p-6 text-slate-300">
+                <p className="text-sm uppercase tracking-[0.2em] text-slate-500">Liens</p>
+                <div className="mt-4 flex flex-wrap gap-3">
+                  {links.map((linkEntry, index) => {
+                    const link = resolveLink(linkEntry);
+                    return (
+                      <a
+                        key={`${link.url}-${index}`}
+                        href={link.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rounded-2xl border border-white/10 bg-slate-950 px-4 py-3 text-sm text-white transition hover:border-purple-400/40 hover:bg-slate-900"
+                      >
+                        {link.label}
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section className="space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-2xl font-semibold text-white">Sessions</h2>
+            <p className="text-sm text-slate-400">{sessions.length} session{sessions.length > 1 ? "s" : ""}</p>
+          </div>
+
+          <div className="grid gap-4">
+            {sessions.length === 0 ? (
+              <div className="rounded-3xl border border-white/10 bg-slate-900/80 p-6 text-slate-400">Aucune session pour cet intervenant.</div>
+            ) : (
+              sessions.map((session) => {
+                const start = new Date(session.start_time);
+                const end = new Date(session.end_time);
+                const timeFormat = new Intl.DateTimeFormat("fr-FR", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                });
+
+                return (
+                  <Link
+                    key={session.id}
+                    href={`/sessions/${session.id}`}
+                    className="block rounded-3xl border border-white/10 bg-slate-900/80 p-6 transition hover:border-purple-400/30 hover:bg-slate-900"
+                  >
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="text-xs uppercase tracking-[0.2em] text-slate-500">{session.event.title}</p>
+                        <h3 className="mt-2 text-xl font-semibold text-white">{session.title}</h3>
+                        <p className="mt-2 text-slate-400 line-clamp-2">{session.description}</p>
                       </div>
-                      <h3 className="font-semibold text-foreground">{session.title}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {timeFormat.format(startTime)}
-                      </p>
+                      <div className="shrink-0 rounded-2xl bg-slate-950/80 px-4 py-3 text-right text-sm text-slate-300">
+                        <div>{timeFormat.format(start)} - {timeFormat.format(end)}</div>
+                        <div className="mt-2 text-slate-400">{session.room.name}</div>
+                      </div>
                     </div>
-                  </div>
-                </a>
-              );
-            })
-          )}
-        </div>
+                  </Link>
+                );
+              })
+            )}
+          </div>
+        </section>
       </div>
     </PublicLayout>
   );

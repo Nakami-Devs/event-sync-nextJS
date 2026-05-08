@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import PublicLayout from '@/components/PublicLayout';
+import PublicLayout from '@/components/sections/PublicLayout';
 import { EVENTS, SESSIONS, isSessionLive } from '@/lib/mockData';
 
 interface EventPageProps {
