@@ -13,7 +13,8 @@ export const sessions = [
     room: "Salle B",
     start: "09:00",
     end: "10:00",
-    speaker: "Jean Marc"
+    speaker: "Jean Marc",
+    isLive: true
   },
   {
     id: 2,
@@ -21,7 +22,8 @@ export const sessions = [
     room: "Salle Pi",
     start: "09:00",
     end: "10:00",
-    speaker: "Sarah Smith"
+    speaker: "Sarah Smith",
+    isLive: false
   },
   {
     id: 3,
@@ -29,7 +31,8 @@ export const sessions = [
     room: "Salle Sigma",
     start: "09:00",
     end: "10:00",
-    speaker: "Alex Johnson"
+    speaker: ["Alex Johnson", "Michael Lee"],
+    isLive: true
   },
   {
     id: 4,
@@ -37,15 +40,17 @@ export const sessions = [
     room: "Salle B",
     start: "10:00",
     end: "11:00",
-    speaker: "David Kim"
+    speaker: "David Kim",
+    isLive: false
   },
   {
     id: 5,
-    title: "personal branding",
+    title: "Personal Branding",
     room: "Salle NP",
-    start: "8:00",
+    start: "08:00",
     end: "11:00",
-    speaker: "Dr Fortunat Andria"
+    speaker: "Dr Fortunat Andria",
+    isLive: false
   },
   {
     id: 6,
@@ -53,14 +58,16 @@ export const sessions = [
     room: "Numer",
     start: "13:00",
     end: "14:00",
-    speaker: "Ryan Andriamahery"
+    speaker: "Ryan Andriamahery",
+    isLive: false
   },
   {
     id: 7,
-    title: "Introduction EL",
+    title: "Advanced EL Workshop",
     room: "Numer",
     start: "14:00",
     end: "16:00",
-    speaker: "Ryan Andriamahery"
+    speaker: ["Ryan Andriamahery", "Sarah Kim"],
+    isLive: false
   }
 ]
