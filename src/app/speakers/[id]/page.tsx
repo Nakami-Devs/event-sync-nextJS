@@ -1,8 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 
-import PublicLayout from "@/components/sections/PublicLayout";
-
 type SpeakerSession = {
   id: string;
   title: string;
@@ -32,7 +30,9 @@ type SpeakerDetails = {
 };
 
 async function getSpeaker(id: string): Promise<SpeakerDetails | null> {
-  const res = await fetch(`/api/speakers/${id}`, { cache: "no-store" });
+  const res = await fetch(${process.env.NEXT_PUBLIC_API_URL || ''}/api/speakers/${id}, { 
+    cache: "no-store" 
+  });
   if (!res.ok) return null;
   const payload = await res.json();
   return payload?.data ?? null;
@@ -62,8 +62,19 @@ export default async function SpeakerPage({ params }: { params: Promise<{ id: st
   const sessions = speaker.sessions?.all ?? [];
 
   return (
-    <PublicLayout>
-      <div className="space-y-10">
+    <main className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-950">
+      <div className="container mx-auto px-4 py-8 max-w-6xl space-y-10">
+        {/* En-tête avec navigation retour */}
+        <div className="mb-6">
+          <Link 
+            href="/speakers" 
+            className="inline-flex items-center text-sm text-slate-400 hover:text-white transition-colors"
+          >
+            ← Retour aux intervenants
+          </Link>
+        </div>
+
+        {/* Section profil */}
         <section className="grid gap-8 rounded-3xl border border-white/10 bg-slate-900/80 p-8 shadow-xl shadow-slate-950/20 lg:grid-cols-[280px_1fr]">
           <div className="space-y-6 text-center">
             <img
@@ -122,6 +133,7 @@ export default async function SpeakerPage({ params }: { params: Promise<{ id: st
           </div>
         </section>
 
+        {/* Section sessions */}
         <section className="space-y-4">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-2xl font-semibold text-white">Sessions</h2>
@@ -130,7 +142,9 @@ export default async function SpeakerPage({ params }: { params: Promise<{ id: st
 
           <div className="grid gap-4">
             {sessions.length === 0 ? (
-              <div className="rounded-3xl border border-white/10 bg-slate-900/80 p-6 text-slate-400">Aucune session pour cet intervenant.</div>
+              <div className="rounded-3xl border border-white/10 bg-slate-900/80 p-6 text-slate-400">
+                Aucune session pour cet intervenant.
+              </div>
             ) : (
               sessions.map((session) => {
                 const start = new Date(session.start_time);
@@ -164,6 +178,6 @@ export default async function SpeakerPage({ params }: { params: Promise<{ id: st
           </div>
         </section>
       </div>
-    </PublicLayout>
+    </main>
   );
 }
