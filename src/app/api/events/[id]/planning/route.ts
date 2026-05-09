@@ -3,14 +3,15 @@ import {prisma} from "@/lib/prisma";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: {  params: Promise<{ id: string }> }
 ) {
+  const { id } = await params
   try {
     const { searchParams } = new URL(request.url)
     const room = searchParams.get('room')
     
     const whereCondition: any = {
-      eventId: params.id
+      eventId: { id}
     }
     
     if (room) {
@@ -55,7 +56,7 @@ export async function GET(
     return NextResponse.json({
       success: true,
       data: {
-        eventId: params.id,
+        eventId: { id},
         rooms: Object.keys(planningByRoom),
         planning: planningByRoom,
         currentTime: now.toISOString()
