@@ -83,3 +83,30 @@ export async function PUT(req: NextRequest, {params}: Params) {
     return NextResponse.json({ message: 'Erreur interne du serveur' }, { status: 500 })
   }
 }
+
+export async function DELETE(_req: NextRequest, { params }: Params) {
+  try {
+    const existing = await prisma.speaker.findUnique({
+      where: { id: (await params).id },
+    })
+
+    if (!existing) {
+      return NextResponse.json(
+          { message: 'Intervenant non trouvé' },
+          { status: 404 }
+      )
+    }
+
+    await prisma.speaker.delete({
+      where: { id: (await params).id },
+    })
+
+    return NextResponse.json(
+        { message: 'Intervenant supprimé' },
+        { status: 200 }
+    )
+  } catch (error) {
+    console.error('Erreur lors de la suppression de l\'intervenant', error)
+    return NextResponse.json({ message: 'Erreur interne du serveur' }, { status: 500 })
+  }
+}
