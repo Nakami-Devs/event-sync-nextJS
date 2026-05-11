@@ -1,18 +1,33 @@
 type Props = {
   title: string
-  speaker: string
   start: string
   end: string
+  room?: string
+  speaker: string | string[]
+  isLive?: boolean
 }
 
 export default function SessionCard({
   title,
-  speaker,
   start,
-  end
+  end,
+  room,
+  speaker,
+  isLive = false
 }: Props) {
+
+  const speakerText = Array.isArray(speaker)
+    ? speaker.join(", ")
+    : speaker
+
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xl hover:bg-white/10 transition">
+    <div className="relative bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xl hover:bg-white/10 transition">
+
+      {isLive && (
+        <span className="absolute top-3 right-3 bg-red-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">
+          LIVE
+        </span>
+      )}
 
       <p className="text-xs text-purple-400">
         {start} - {end}
@@ -22,8 +37,14 @@ export default function SessionCard({
         {title}
       </h3>
 
+      {room && (
+        <p className="text-sm text-gray-400 mt-1">
+          {room}
+        </p>
+      )}
+
       <p className="text-sm text-gray-400 mt-2">
-        {speaker}
+        👤 {speakerText}
       </p>
 
     </div>
