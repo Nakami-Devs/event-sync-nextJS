@@ -1,10 +1,13 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const speaker = await prisma.speaker.findUnique({
-      where: { id: params.id },
+      where: { id: (await params).id },
       include: {
         sessions: {
           include: {
@@ -30,7 +33,7 @@ export async function GET(
             }
           },
           orderBy: {
-            startTime: 'asc'
+            start_time: 'asc'
           }
         }
       }

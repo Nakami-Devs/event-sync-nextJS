@@ -1,41 +1,49 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+  { params }: { params: Promise<{ id: string }> }
+)
+{
+  const { id } = await params
+
   try {
     const event = await prisma.event.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         sessions: {
           include: {
             speakers: true,
             questions: {
               orderBy: {
-                upvotes: 'desc'
+                upvote_numbers: 'desc'
               }
             }
           },
           orderBy: {
-            startTime: 'asc'
+            start_time: 'asc'
           }
         }
       }
     })
-    
+
     if (!event) {
       return NextResponse.json(
         { success: false, error: 'Event not found' },
         { status: 404 }
       )
     }
-    
+
     const now = new Date()
+
     const sessionsWithLiveStatus = event.sessions.map(session => ({
       ...session,
-      isLive: now >= new Date(session.startTime) && now <= new Date(session.endTime)
+      isLive:
+        now >= new Date(session.start_time) &&
+        now <= new Date(session.end_time)
     }))
-    
+
     return NextResponse.json({
       success: true,
       data: {
@@ -43,6 +51,7 @@ export async function GET(
         sessions: sessionsWithLiveStatus
       }
     })
+
   } catch (error) {
     return NextResponse.json(
       { success: false, error: 'Error while retrieving event' },

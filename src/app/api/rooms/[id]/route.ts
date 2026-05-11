@@ -1,12 +1,14 @@
 import {NextRequest, NextResponse} from "next/server";
 import {prisma} from "@/lib/prisma";
 
-type Params = { params: { roomId: string } }
-
+type Params = {
+  params: Promise<{ id: string }>
+}
 export async function GET(_req: NextRequest, { params }: Params) {
+      const { id } = await params
     try {
         const room = await prisma.room.findUnique({
-            where: { id: params.roomId },
+              where: { id },
             include: { sessions: true }
         })
 
@@ -27,11 +29,12 @@ export async function GET(_req: NextRequest, { params }: Params) {
 }
 
 export async function PUT(req: NextRequest, { params }: Params) {
+    const   { id } = await params
     try {
         const { name, capacity } = await req.json()
 
         const existing = await prisma.room.findUnique({
-            where: { id: params.roomId }
+            where: { id}
         })
 
         if (!existing) {
@@ -42,7 +45,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
         }
 
         const updated = await prisma.room.update({
-            where: { id: params.roomId },
+            where: { id },
             data: {
                 ...(name && { name }),
                 ...(capacity && { capacity }),
@@ -59,9 +62,10 @@ export async function PUT(req: NextRequest, { params }: Params) {
 }
 
 export async function DELETE(_req: NextRequest, { params }: Params) {
+    const { id } = await params
     try {
         const existing = await prisma.room.findUnique({
-            where: { id: params.roomId }
+            where: { id}
         })
 
         if (!existing) {
@@ -71,7 +75,7 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
             )
         }
 
-        await prisma.room.delete({ where: { id: params.roomId } })
+        await prisma.room.delete({ where: { id } })
 
         return NextResponse.json(
             { message: 'Room deleted successfully' },
