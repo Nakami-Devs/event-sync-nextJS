@@ -30,13 +30,11 @@ type SpeakerDetails = {
 };
 
 async function getSpeaker(id: string): Promise<SpeakerDetails | null> {
-  const res = await fetch(${process.env.NEXT_PUBLIC_API_URL || ''}/api/speakers/${id}, { 
-    cache: "no-store" 
-  });
+  const res = await fetch(`http://localhost:3000/api/sessions/${id}`);
   if (!res.ok) return null;
   const payload = await res.json();
   return payload?.data ?? null;
-}
+};
 
 function resolveLink(entry: string | { title?: string; url?: string }) {
   if (typeof entry === "string") {
@@ -64,7 +62,6 @@ export default async function SpeakerPage({ params }: { params: Promise<{ id: st
   return (
     <main className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-950">
       <div className="container mx-auto px-4 py-8 max-w-6xl space-y-10">
-        {/* En-tête avec navigation retour */}
         <div className="mb-6">
           <Link 
             href="/speakers" 
@@ -74,7 +71,6 @@ export default async function SpeakerPage({ params }: { params: Promise<{ id: st
           </Link>
         </div>
 
-        {/* Section profil */}
         <section className="grid gap-8 rounded-3xl border border-white/10 bg-slate-900/80 p-8 shadow-xl shadow-slate-950/20 lg:grid-cols-[280px_1fr]">
           <div className="space-y-6 text-center">
             <img
@@ -133,7 +129,6 @@ export default async function SpeakerPage({ params }: { params: Promise<{ id: st
           </div>
         </section>
 
-        {/* Section sessions */}
         <section className="space-y-4">
           <div className="flex items-center justify-between gap-4">
             <h2 className="text-2xl font-semibold text-white">Sessions</h2>
