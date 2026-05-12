@@ -1,103 +1,112 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
+type Params = { params: Promise<{ id: string }> }
+export async function GET(_req: NextRequest, { params }: Params ) {
   try {
     const speaker = await prisma.speaker.findUnique({
       where: { id: (await params).id },
       include: {
         sessions: {
           include: {
-            event: {
-              select: {
-                id: true,
-                title: true,
-                startDate: true,
-                endDate: true
+            session: {
+              include: {
+                event: true,
+                room: true,
               }
             },
-            questions: {
-              select: {
-                id: true,
-                content: true,
-                upvotes: true,
-                createdAt: true
-              },
-              orderBy: {
-                upvotes: 'desc'
-              },
-              take: 10
-            }
           },
-          orderBy: {
-            start_time: 'asc'
-          }
-        }
-      }
+        },
+      },
     })
     
     if (!speaker) {
       return NextResponse.json(
-        { success: false, error: 'Speaker not found' },
+        { message: 'Intervenant non trouvé' },
         { status: 404 }
       )
     }
-    
-    let externalLinks = []
-    if (speaker.externalLinks) {
-      try {
-        externalLinks = JSON.parse(speaker.externalLinks)
-      } catch {
-        externalLinks = []
-      }
-    }
-    
-    const totalSessions = speaker.sessions.length
-    const totalQuestions = speaker.sessions.reduce(
-      (sum, session) => sum + session.questions.length, 
-      0
-    )
-    const totalUpvotes = speaker.sessions.reduce(
-      (sum, session) => sum + session.questions.reduce(
-        (qSum, q) => qSum + q.upvotes, 0
-      ), 
-      0
-    )
-    
-    const now = new Date()
-    const upcomingSessions = speaker.sessions.filter(
-      session => new Date(session.startTime) > now
-    )
-    const pastSessions = speaker.sessions.filter(
-      session => new Date(session.endTime) < now
-    )
-    
-    return NextResponse.json({
-      success: true,
-      data: {
-        ...speaker,
-        externalLinks,
-        statistics: {
-          totalSessions,
-          totalQuestions,
-          totalUpvotes,
-          upcomingSessions: upcomingSessions.length,
-          pastSessions: pastSessions.length
-        },
-        sessions: {
-          upcoming: upcomingSessions,
-          past: pastSessions,
-          all: speaker.sessions
-        }
-      }
-    })
+    return NextResponse.json(speaker, { status : 200 })
   } catch (error) {
+    console.error('Erreur lors de la récupération de l\'intervenant', error);
     return NextResponse.json(
-      { success: false, error: 'Error while retrieving speaker' },
+      { message: 'Erreur interne du serveur' },
       { status: 500 }
     )
+  }
+}
+
+export async function PUT(req: NextRequest, {params}: Params) {
+  try{
+    const { full_name, profile_pic, biography, external_links } = await req.json()
+
+    const existing = await prisma.speaker.findUnique({
+      where: {id: (await params).id},
+    })
+
+    if(!existing){
+      return NextResponse.json(
+          { message: 'Intervenant non trouvé' },
+          { status: 404 }
+      )
+    }
+
+    if (full_name && full_name !== existing.full_name) {
+      const duplicateName = await prisma.speaker.findFirst({
+        where: {
+          full_name,
+          NOT: { id: (await params).id },
+        },
+      })
+
+      if (duplicateName) {
+        return NextResponse.json(
+            { message: `Un intervenant avec le nom "${full_name}" existe déjà` },
+            { status: 409 }
+        )
+      }
+    }
+
+    const updated = await prisma.speaker.update({
+      where: { id: (await params).id },
+      data: {
+        ...(full_name && { full_name }),
+        ...(profile_pic && { profile_pic }),
+        ...(biography && { biography }),
+        ...(external_links && { external_links }),
+      },
+    })
+
+    return NextResponse.json(updated, {status: 200})
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour de l\'intervenant', error)
+    return NextResponse.json({ message: 'Erreur interne du serveur' }, { status: 500 })
+  }
+}
+
+export async function DELETE(_req: NextRequest, { params }: Params) {
+  try {
+    const existing = await prisma.speaker.findUnique({
+      where: { id: (await params).id },
+    })
+
+    if (!existing) {
+      return NextResponse.json(
+          { message: 'Intervenant non trouvé' },
+          { status: 404 }
+      )
+    }
+
+    await prisma.speaker.delete({
+      where: { id: (await params).id },
+    })
+
+    return NextResponse.json(
+        { message: 'Intervenant supprimé' },
+        { status: 200 }
+    )
+  } catch (error) {
+    console.error('Erreur lors de la suppression de l\'intervenant', error)
+    return NextResponse.json({ message: 'Erreur interne du serveur' }, { status: 500 })
   }
 }
