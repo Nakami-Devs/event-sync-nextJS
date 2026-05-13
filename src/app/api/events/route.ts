@@ -1,5 +1,5 @@
 import {NextRequest, NextResponse} from 'next/server';
-import {createPrismaClient} from "@/lib/prisma";
+import {createPrismaClient, prisma} from "@/lib/prisma";
 
 export async function GET() {
   try {
@@ -47,6 +47,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
           { message: 'Start date should be before the end date' },
           { status: 400 }
+      )
+    }
+
+    const existingEvent = await prisma.event.findFirst({
+      where: {
+        title,
+        place,
+        start_date: new Date(start_date),
+      }
+    });
+
+    if(existingEvent){
+      return NextResponse.json(
+          { message: `Un événement ${title} existe déjà à ${place} à cette date`},
+          { status: 409 }
       )
     }
 

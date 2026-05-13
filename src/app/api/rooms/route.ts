@@ -23,6 +23,20 @@ export async function POST(req: NextRequest){
             )
         }
 
+        const existingRoom = await prisma.room.findFirst({
+            where: {
+                name,
+                capacity,
+            }
+        });
+
+        if(existingRoom){
+            return NextResponse.json(
+                { message: `Une salle ${name} existe déjà`},
+                { status: 409 }
+            )
+        }
+
         const room = await prisma.room.create({
             data: { name, capacity }
         })
