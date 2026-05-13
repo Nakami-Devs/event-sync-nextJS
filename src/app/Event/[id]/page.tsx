@@ -9,8 +9,14 @@ type Speaker = {
   full_name: string;
   profile_pic: string;
   biography: string;
+  external_links: string;
 };
 
+type Room = {
+  id: String;
+  name: string;
+  capacity: string;
+}
 type Session = {
   id: string;
   title: string;

@@ -95,10 +95,9 @@ export default function SpeakerDetailPage() {
   const handleDelete = async () => {
     if (confirm("Êtes-vous sûr de vouloir supprimer cet intervenant ?")) {
       try {
-        // Appel API pour supprimer : `/api/speakers/${id}`
         console.log("Suppression du speaker:", id);
         alert("Intervenant supprimé avec succès");
-        router.push("/speakers"); // Redirection vers la liste des speakers
+        router.push("/speakers");
       } catch (error) {
         console.error("Erreur lors de la suppression:", error);
         alert("Erreur lors de la suppression");
