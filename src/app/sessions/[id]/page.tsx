@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation'
 import Image from 'next/image'
-import Link from 'next/link'
 import QuestionSection from './QuestionSection'
 
 type Speaker = {
@@ -15,10 +14,10 @@ type SessionSpeaker = {
 }
 
 type Question = {
-  id:             string
-  content:        string
-  name:           string
-  upvote_numbers: number
+  id:                string
+  content:           string
+  name:              string
+  upvote_numbers:    number
   creation_datetime: string
 }
 
@@ -29,7 +28,6 @@ type Session = {
   start_time:  string
   end_time:    string
   is_live:     boolean
-  id_event:    string
   room:        { name: string; capacity: string }
   event:       { title: string }
   speakers:    SessionSpeaker[]
@@ -48,14 +46,12 @@ async function getSession(id: string): Promise<Session | null> {
   }
 }
 
-
 function formatTime(dateString: string): string {
   return new Date(dateString).toLocaleTimeString('fr-FR', {
     hour:   '2-digit',
     minute: '2-digit'
   })
 }
-
 
 function formatDate(dateString: string): string {
   return new Date(dateString).toLocaleDateString('fr-FR', {
@@ -79,57 +75,32 @@ export default async function SessionDetailPage({
     <main className="min-h-screen bg-[#12132A] text-white">
       <div className="max-w-4xl mx-auto px-6 py-8">
 
-       
-        <Link
-          href={`/events/${session.id_event}`}
-          className="inline-flex items-center gap-2 text-gray-400 hover:text-white text-sm mb-6 transition-colors"
-        >
-          ← Retour à {session.event.title}
-        </Link>
+        
+        {session.is_live && (
+          <span className="inline-flex items-center gap-1.5 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-4">
+            <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+            LIVE
+          </span>
+        )}
 
        
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex-1">
+        <h1 className="text-4xl font-bold text-white mb-4">
+          {session.title}
+        </h1>
 
-            
-            {session.is_live && (
-              <span className="inline-flex items-center gap-1.5 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-4">
-                <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-                LIVE
-              </span>
-            )}
-
-           
-            <h1 className="text-4xl font-bold text-white mb-4">
-              {session.title}
-            </h1>
-
-           
-            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-300">
-              <span className="flex items-center gap-1.5">
-                📅 {formatDate(session.start_time)}
-              </span>
-              <span className="flex items-center gap-1.5">
-                🕐 {formatTime(session.start_time)} — {formatTime(session.end_time)}
-              </span>
-              <span className="flex items-center gap-1.5">
-                📍 {session.room.name}
-              </span>
-              {session.room.capacity && (
-                <span className="flex items-center gap-1.5">
-                  👥 {session.room.capacity} places
-                </span>
-              )}
-            </div>
-          </div>
-
-          
-          <button className="text-gray-500 hover:text-red-400 transition-colors mt-1">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-            </svg>
-          </button>
+        
+        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-300 mb-2">
+          <span>📅 {formatDate(session.start_time)}</span>
+          <span>🕐 {formatTime(session.start_time)} — {formatTime(session.end_time)}</span>
+          <span>📍 {session.room.name}</span>
+          {session.room.capacity && (
+            <span>👥 {session.room.capacity} places</span>
+          )}
         </div>
+
+        <p className="text-gray-500 text-xs mb-8">
+          Événement : {session.event.title}
+        </p>
 
        
         <hr className="border-white/10 mb-8" />
