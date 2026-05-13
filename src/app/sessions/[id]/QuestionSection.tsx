@@ -17,7 +17,8 @@ type Props = {
 
 
 function relativeTime(dateString: string): string {
-  const diff = Date.now() - new Date(dateString).getTime()
+  if (!dateString) return ''
+  const diff    = Date.now() - new Date(dateString).getTime()
   const minutes = Math.floor(diff / 60000)
   if (minutes < 1)  return "À l'instant"
   if (minutes < 60) return `Il y a ${minutes}min`
@@ -32,7 +33,7 @@ export default function QuestionSection({ sessionId, initialQuestions }: Props) 
   const [loading,   setLoading]   = useState(false)
   const [error,     setError]     = useState('')
 
-
+ 
   async function handleSubmit() {
     if (!content.trim()) {
       setError('La question ne peut pas être vide.')
@@ -60,6 +61,8 @@ export default function QuestionSection({ sessionId, initialQuestions }: Props) 
       }
 
       const newQuestion: Question = await res.json()
+
+     
       setQuestions(prev => [newQuestion, ...prev])
       setContent('')
       setName('')
@@ -80,6 +83,7 @@ export default function QuestionSection({ sessionId, initialQuestions }: Props) 
       if (!res.ok) return
 
       const updated: Question = await res.json()
+
       setQuestions(prev =>
         prev
           .map(q => q.id === questionId ? updated : q)
@@ -125,7 +129,6 @@ export default function QuestionSection({ sessionId, initialQuestions }: Props) 
             disabled={loading}
             className="flex items-center gap-2 bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"
           >
-            
             <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
             </svg>
@@ -139,7 +142,7 @@ export default function QuestionSection({ sessionId, initialQuestions }: Props) 
         )}
       </div>
 
-      
+     
       {questions.length === 0 ? (
         <p className="text-gray-500 text-sm text-center py-6">
           Aucune question pour l&apos;instant. Soyez le premier !
@@ -166,13 +169,11 @@ export default function QuestionSection({ sessionId, initialQuestions }: Props) 
                   </span>
                 </button>
 
-               
+                
                 <div className="flex-1">
                   <p className="text-white text-sm font-medium mb-2">
                     {question.content}
                   </p>
-
-                 
                   <div className="flex items-center gap-2 text-xs text-gray-500">
                     <span className="flex items-center gap-1 bg-white/10 rounded-full px-2 py-0.5">
                       👤 {question.name}
@@ -181,15 +182,7 @@ export default function QuestionSection({ sessionId, initialQuestions }: Props) 
                     <span>{relativeTime(question.creation_datetime)}</span>
                   </div>
                 </div>
-
-               
-                <div className="flex items-center gap-1 text-gray-500 text-xs">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                  </svg>
-                  0 réponse
-                </div>
-
+                
               </div>
             </div>
           ))}
