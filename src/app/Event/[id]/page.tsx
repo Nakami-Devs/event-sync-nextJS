@@ -9,25 +9,37 @@ type Speaker = {
   full_name: string;
   profile_pic: string;
   biography: string;
-  external_links: string;
+};
+
+type SessionSpeaker = {
+  id_speaker: string;
+  id_session: string;
+  speaker: Speaker;
 };
 
 type Room = {
-  id: String;
+  id: string;
   name: string;
   capacity: string;
-}
+};
+
+type EventType = {
+  id: string;
+  title: string;
+  description: string;
+};
+
 type Session = {
   id: string;
   title: string;
   description: string;
   start_time: string;
   end_time: string;
-  room: {
-    name: string;
-    capacity: string;
-  };
-  speakers: Speaker[];
+  id_event: string;
+  id_room: string;
+  room: Room;
+  event: EventType;
+  speakers: SessionSpeaker[];
 };
 
 type EventData = {
@@ -43,7 +55,7 @@ type EventData = {
 export default function EventPage() {
   const params = useParams();
   const eventId = params?.id as string;
-  
+
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [event, setEvent] = useState<EventData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -53,6 +65,12 @@ export default function EventPage() {
     const fetchEvent = async () => {
       setLoading(true);
       try {
+        const response = await fetch(`/api/${eventId}`);
+        if (!response.ok) throw new Error("Événement non trouvé");
+        const data = await response.json();
+        setEvent(data.data || data);
+      } catch (error) {
+        console.error("Erreur lors du chargement de l'événement:", error);
         const mockEvent: EventData = {
           id: eventId,
           title: "Test Live",
@@ -67,23 +85,44 @@ export default function EventPage() {
               description: "dgdthyhtht",
               start_time: "2026-05-04T09:00:00Z",
               end_time: "2026-05-04T20:00:00Z",
+              id_event: eventId,
+              id_room: "room1",
               room: {
+                id: "room1",
                 name: "Rooftop",
-                capacity: "500 places"
+                capacity: "500"
+              },
+              event: {
+                id: eventId,
+                title: "Test Live",
+                description: "fdhrtydhhrtf"
               },
               speakers: [
-                { id: "sp1", full_name: "Nelio Giovanni", profile_pic: "/avatars/nelio.jpg", biography: "Speaker" },
-                { id: "sp2", full_name: "RANDRIANASOLO Finoana", profile_pic: "/avatars/finoana.jpg", biography: "Speaker" },
-                { id: "sp3", full_name: "Fanamby Fitia", profile_pic: "/avatars/fanamby.jpg", biography: "Speaker" },
-                { id: "sp4", full_name: "Maherison Koloina", profile_pic: "/avatars/koloina.jpg", biography: "Speaker" },
+                {
+                  id_speaker: "sp1",
+                  id_session: "sess1",
+                  speaker: { id: "sp1", full_name: "Nelio Giovanni", profile_pic: "/avatars/nelio.jpg", biography: "Speaker" }
+                },
+                {
+                  id_speaker: "sp2",
+                  id_session: "sess1",
+                  speaker: { id: "sp2", full_name: "RANDRIANASOLO Finoana", profile_pic: "/avatars/finoana.jpg", biography: "Speaker" }
+                },
+                {
+                  id_speaker: "sp3",
+                  id_session: "sess1",
+                  speaker: { id: "sp3", full_name: "Fanamby Fitia", profile_pic: "/avatars/fanamby.jpg", biography: "Speaker" }
+                },
+                {
+                  id_speaker: "sp4",
+                  id_session: "sess1",
+                  speaker: { id: "sp4", full_name: "Maherison Koloina", profile_pic: "/avatars/koloina.jpg", biography: "Speaker" }
+                },
               ]
             }
           ]
         };
-        
         setEvent(mockEvent);
-      } catch (error) {
-        console.error("Erreur lors du chargement de l'événement:", error);
       } finally {
         setLoading(false);
       }
@@ -186,9 +225,17 @@ export default function EventPage() {
           {event.sessions.map((session) => (
             <article key={session.id} className={isDark ? "overflow-hidden rounded-[2rem] bg-gradient-to-br from-orange-500 via-orange-400 to-orange-300 p-8 text-slate-950 shadow-2xl shadow-slate-950/40 mb-8" : "overflow-hidden rounded-[2rem] bg-gradient-to-br from-amber-200 via-orange-200 to-amber-100 p-8 shadow-2xl mb-8"}>
               <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-                <div>
+                <div className="flex-1">
                   <h3 className={isDark ? "text-3xl font-semibold text-slate-950" : "text-3xl font-semibold"}>{session.title}</h3>
                   <p className={isDark ? "mt-3 text-slate-900/70" : "mt-3 text-slate-700"}>{session.description}</p>
+                  <div className="mt-4 flex gap-2 flex-wrap">
+                    <span className={isDark ? "inline-flex items-center gap-1 rounded-full bg-slate-800/40 px-3 py-1 text-xs font-semibold text-slate-950" : "inline-flex items-center gap-1 rounded-full bg-white/40 px-3 py-1 text-xs font-semibold text-slate-700"}>
+                      Event: {session.id_event}
+                    </span>
+                    <span className={isDark ? "inline-flex items-center gap-1 rounded-full bg-slate-800/40 px-3 py-1 text-xs font-semibold text-slate-950" : "inline-flex items-center gap-1 rounded-full bg-white/40 px-3 py-1 text-xs font-semibold text-slate-700"}>
+                      Room: {session.id_room}
+                    </span>
+                  </div>
                 </div>
                 <button className={isDark ? "self-start rounded-full bg-white/90 px-5 py-3 text-sm font-semibold text-rose-600 shadow-sm hover:bg-white" : "self-start rounded-full bg-white/90 px-5 py-3 text-sm font-semibold text-rose-600 shadow-sm hover:bg-white"}>
                   ♥
@@ -208,14 +255,16 @@ export default function EventPage() {
               </div>
 
               <div className="mt-8 grid gap-4">
-                {session.speakers.map((speaker) => (
-                  <Link href={`/speaker/${speaker.id}`} key={speaker.id}>
+                {session.speakers.map(({ speaker }) => (
+                  <Link href={`/speakers/${speaker.id}`} key={speaker.id}>
                     <div className={isDark ? "flex items-center gap-4 rounded-3xl bg-white/90 p-4 shadow-sm transition hover:bg-white cursor-pointer" : "flex items-center gap-4 rounded-3xl bg-white/90 p-4 shadow-sm transition hover:bg-white cursor-pointer"}>
-                      <div className="flex h-14 w-14 items-center justify-center rounded-full bg-violet-600 text-white text-base font-bold">
-                        {speaker.full_name.charAt(0)}
-                      </div>
+                      <img
+                        src={speaker.profile_pic}
+                        alt={speaker.full_name}
+                        className="h-14 w-14 rounded-full object-cover bg-violet-600"
+                      />
                       <div>
-                        <p className="font-semibold">{speaker.full_name}</p>
+                        <p className="font-semibold text-slate-900">{speaker.full_name}</p>
                         <p className={isDark ? "text-sm text-slate-700" : "text-sm text-slate-500"}>{speaker.biography}</p>
                       </div>
                     </div>
