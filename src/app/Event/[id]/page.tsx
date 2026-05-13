@@ -1,143 +1,194 @@
-import { notFound } from "next/navigation";
-import { EVENTS, SESSIONS , isSessionLive } from "@/lib/mockData";
+'use client';
 
-interface EventPageProps {
-  params: Promise<{ id: string}>;
+import { useState, useEffect } from 'react';
 
-  export default async function EventPage ({params}: EventPageProps ){
-    const {id} = await params;
-    const event = EVENTS?.find(e => e.id === id);
+interface Participant {
+  name: string;
+}
 
-    if (!event) {
-      notFound();
-    }
+interface Session {
+  id: string;
+  title: string;
+  description: string;
+  startTime: string;
+  endTime: string;
+  location: string;
+  capacity: number;
+  participants: Participant[];
+}
 
-    const sessions = SESSIONS?.find(s => s.eventId === id) || [];
-    const liveSessions = sessions.filter(isSessionLive);
+interface Event {
+  id: string;
+  title: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  location: string;
+  activeSessions: number;
+  currentSession: Session;
+}
 
-    const startDate = new Date(event.startDate);
-    const endDate = new Date(event.endDate);
+export default function EventPage({ params }: { params: { id: string } }) {
+  const [event, setEvent] = useState<Event | null>(null);
+  const [viewMode, setViewMode] = useState<'planning' | 'rooftop'>('planning');
 
-    const dateFormat = new Intl.DateTimeFormat('fr-FR', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
+  useEffect(() => {
+    const fetchEvent = async () => {
+      const mockEvent: Event = {
+        id: params.id,
+        title: 'Test Live',
+        description: 'fdhrtydhhrtf',
+        startDate: '2026-05-04',
+        endDate: '2026-05-05',
+        location: 'HEI Ivandry, Antananarivo',
+        activeSessions: 1,
+        currentSession: {
+          id: '1',
+          title: 'Live Test',
+          description: 'dgtdhyththt',
+          startTime: '09:00',
+          endTime: '20:00',
+          location: 'Rooftop',
+          capacity: 500,
+          participants: [
+            { name: 'Nello Giovanni' },
+            { name: 'RANDRIANASOLO Finoana' },
+            { name: 'Fanamby Fitia' },
+            { name: 'Maherison Kololina' }
+          ]
+        }
+      };
+      setEvent(mockEvent);
+    };
 
-    return(
-      <div className= "container mx-auto px-4 py-8 max-w-4xl">
-        <div className= "mb-8">
-          <h1 className= "text-3xl font-bold text-foreground">{event.title}</h1>
-          <p className= "text-lg text-muted-foreground mt-2">{event.description}</p>
+    fetchEvent();
+  }, [params.id]);
 
-          <div className= "flex flex-wrap items-center gap-4 mt-4 text-sm">
-            <div className= "flex items-center gap-2 text-muted-foreground">
-              <svg className= "w-4 h-4" fill= "none" stroke= "currentColor" viewBox= "0 0 24 24">
-                <path strokeLinecap= "round" strokeLinejoin= "round" strokeWidth={2} d= "M8 7V3m-9 8h10M5 
-                21h14a2 2 2 0 002-2V7a 2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-              </svg>
-
-              <span>{dateFormat.format(startDate)} - {dateFormat.format(endDate)}</span>
-            </div>
-
-            <div className= "flex items-center gap-2 text-muted-foreground">
-              <svg className = "w-4 h-4" fill= "none" stroke="currentColor" viewBox= "0 0 24 24">
-                <path strokeLinecap= "round" strokeLinejoin= "round" strokeWidth={2} d= "M17.657
-                16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 111.314 0z"/>
-
-                <path strokeLinecap= "round" strokeLinejoin= "round" strokeWidth={2} d= "M15 
-                11a3 3 0 11-6 0 3 3 0 016 0z"/>
-              </svg>
-
-              <span>{event.location}</span>
-            </div>
-          </div>
-        </div>
-
-        {liveSessions.length > 0 && (
-          <div className = "mb-6 p-4 bg-red-50 dark:bg-red-900/20 border
-          border-red-200 dark:border-red-800 rounded-lg">
-            <div className= "flex items-center gap-2">
-              <span className= "w-2 h-2 rounded-full bg-red-500 animate-pulse"/>
-              <span className= "font-semibold text-red-700 dark:text-red-400">
-                {liveSessions.length} sessions en cours
-              </span>
-            </div>
-          </div>
-        )}
-
-        <div className= "space-y-4">
-          <h2 className= "text-xl font-semibold text-foreground">Programme</h2>
-
-          {SESSIONS.length === 0 ?(
-            <p classsName= "text-muted-foreground">Auccune session prévue pour cette évènement.</p>
-          ): (
-            sessions.map(session => {
-              const isLive = isSessionLive(session);
-              const startTime = new Date(session.startTime);
-              const endTime = new Intl.DateTimeFormat('fr-FR', {
-                hour: '2-digit'
-                minute: '2-digit'
-              });
-
-              return (
-                <a key= {session.id}
-                href={``}
-                className= "block p-4 bg-card border border-border rounded-lg
-                hover:border-primary/50 transition-colors">
-                  <div className= "flex items-start justify-between gap-4">
-                    <div className= "flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        {isLive && (
-                          <span className= "text-xs font-semibold text-red-600 
-                          dark:text-red-400 bg-red-100 dark:bg-red-900/30 px-2 py-0.5
-                          rounded-full flex items-center gap-1">
-                            <span className= "w-1 h-1 rounded-full bg-red-500 animate-pulse"/>
-                            LIVE 
-                          </span>
-                        )}
-
-                        <span className= "text-xs font-medium text-muted-foreground bg-muted px-2
-                        py-0.5 rounded-full">{session.room.name}</span>
-
-                        <span className= "text-xs font-medium text-muted-foreground bg-muted 
-                        px-2 py-0.5 rounded-full">{session.track}</span>
-
-                        <div>
-                          <h3 className= "font-semibold text-foreground">{session.title}</h3>
-                          <p clasName= "text-sm text-muted-foreground mt-1 line-clamp-2">
-                            {session.description}</p>
-                        </div>
-
-                         <div className= " text-right text-sm text-muted-foreground shrink-0">
-                         <div>{timeFormat.format(startTime)} - {timeFormat.format(endTime)}</div>
-                         </div>
-                      </div>
-
-                      {session.speakers.length >0 && (
-                        <div className= "flex items-center gap-2 mt-3 pt-3 border-t
-                        border-border">
-                          <div className= "flex -space-x-2">
-                            {session.speakers.slice(0.3).map(speaker => (
-                              <img key = {speaker.id} src="" alt="" className= "w-6 h-6 rounded-full border-2
-                              border-card"/>
-                            ))}
-                          </div>
-
-                          <span className= "text-xs text-muted-foreground">
-                            {sessionStorage.speakers.map(s => s.name).join(',')}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </a>
-              )
-            })
-          )}
-        </div>
+  if (!event) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-gray-500">Chargement...</div>
       </div>
     );
   }
+
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+  };
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+        <div className="max-w-6xl mx-auto px-4 py-12">
+          <h1 className="text-5xl font-bold mb-2">EventSync</h1>
+          <p className="text-xl opacity-90">Gérez vos événements en temps réel</p>
+        </div>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">{event.title}</h2>
+          <p className="text-gray-500 mb-4">{event.description}</p>
+          
+          <div className="flex flex-wrap gap-6 text-gray-600">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">📅</span>
+              <span>{formatDate(event.startDate)} — {formatDate(event.endDate)}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xl">📍</span>
+              <span>{event.location}</span>
+            </div>
+          </div>
+
+          <div className="flex gap-4 mt-6">
+            <button 
+              onClick={() => setViewMode('planning')}
+              className={`px-6 py-2 rounded-lg font-medium transition-all ${
+                viewMode === 'planning' 
+                  ? 'bg-blue-600 text-white shadow-lg' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Voir le planning
+            </button>
+            <button 
+              onClick={() => setViewMode('rooftop')}
+              className={`px-6 py-2 rounded-lg font-medium transition-all ${
+                viewMode === 'rooftop' 
+                  ? 'bg-purple-600 text-white shadow-lg' 
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              Rooftop
+            </button>
+          </div>
+        </div>
+
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+            <h3 className="text-xl font-semibold text-gray-800">
+              Sessions en cours ({event.activeSessions})
+            </h3>
+          </div>
+
+          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div className="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-3">
+              <span className="text-white font-semibold">LIVE</span>
+            </div>
+            
+            <div className="p-6">
+              <h4 className="text-2xl font-bold text-gray-800 mb-2">
+                {event.currentSession.title}
+              </h4>
+              <p className="text-gray-500 mb-4">{event.currentSession.description}</p>
+              
+              <div className="flex flex-wrap gap-6 mb-6 text-gray-600">
+                <div className="flex items-center gap-2">
+                  <span>⏰</span>
+                  <span>{event.currentSession.startTime} — {event.currentSession.endTime}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span>📍</span>
+                  <span>{event.currentSession.location}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span>👥</span>
+                  <span>{event.currentSession.participants.length} / {event.currentSession.capacity} places</span>
+                </div>
+              </div>
+
+              <div className="border-t border-gray-200 pt-4">
+                <h5 className="font-semibold text-gray-700 mb-3">
+                  Participants ({event.currentSession.participants.length})
+                </h5>
+                <div className="flex flex-wrap gap-2">
+                  {event.currentSession.participants.map((participant, idx) => (
+                    <span 
+                      key={idx}
+                      className="px-3 py-1.5 bg-gray-100 rounded-lg text-gray-700 text-sm"
+                    >
+                      {participant.name}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {viewMode === 'rooftop' && (
+          <div className="bg-white rounded-xl p-6 shadow-lg mt-6">
+            <h4 className="font-semibold text-gray-800 mb-3">Progression de la session</h4>
+            <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-full bg-purple-500 rounded-full" style={{ width: '65%' }} />
+            </div>
+            <p className="text-sm text-gray-500 mt-2">65% de la session complétée</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }
