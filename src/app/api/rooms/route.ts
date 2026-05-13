@@ -8,7 +8,8 @@ export async function GET(){
         })
         return NextResponse.json(rooms, { status: 200 })
     } catch (error) {
-        return NextResponse.json({ message: 'Server error' }, { status: 500 })
+        console.error('Erreur lors de la récupération des salles', error)
+        return NextResponse.json({ message: 'Erreur interne du serveur' }, { status: 500 })
     }
 }
 
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest){
 
         if (!name || !capacity) {
             return NextResponse.json(
-                { message: 'Name and capacity required' },
+                { message: 'Les champs name et capacity sont requis' },
                 { status: 400 }
             )
         }
@@ -29,6 +30,7 @@ export async function POST(req: NextRequest){
 
         return NextResponse.json(room, { status: 201 })
     } catch (error) {
-        return NextResponse.json({ message: 'Server error' }, { status: 500 })
+        console.error('Erreur lors de la création de la salle', error)
+        return NextResponse.json({ message: 'Erreur interne du serveur' }, { status: 500 })
     }
 }
