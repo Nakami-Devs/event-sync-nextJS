@@ -1,141 +1,428 @@
-import { notFound } from 'next/navigation';
-import PublicLayout from '@/components/PublicLayout';
-import { EVENTS, SESSIONS, isSessionLive } from '@/lib/mockData';
+"use client";
 
-interface EventPageProps {
-  params: Promise<{ id: string }>;
-}
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
-export default async function EventPage({ params }: EventPageProps) {
-  const { id } = await params;
-  const event = EVENTS?.find(e => e.id === id);
+type Speaker = {
+  id: string;
+  full_name: string;
+  profile_pic: string;
+  biography: string;
+};
+
+type SessionSpeaker = {
+  id_speaker: string;
+  id_session: string;
+  speaker: Speaker;
+};
+
+type Session = {
+  id: string;
+  title: string;
+  description: string;
+  start_time: string;
+  end_time: string;
+  room: {
+    id: string;
+    name: string;
+    capacity: string;
+  };
+  speakers: SessionSpeaker[];
+};
+
+type EventData = {
+  id: string;
+  title: string;
+  description: string;
+  start_date: string;
+  end_date: string;
+  place: string;
+  sessions: Session[];
+};
+
+type PlanningSession = {
+  id: string;
+  title: string;
+  description: string;
+  start_time: string;
+  end_time: string;
+  room: string;
+  speakers: SessionSpeaker[];
+  isLive: boolean;
+  timeSlot: string;
+};
+
+type PlanningData = {
+  success: boolean;
+  data: {
+    eventId: string;
+    rooms: string[];
+    planning: Record<string, PlanningSession[]>;
+    currentTime: string;
+  };
+};
+
+export default function EventPage() {
+  const params = useParams();
+  const eventId = params?.id as string;
   
-  if (!event) {
-    notFound();
-  }
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [event, setEvent] = useState<EventData | null>(null);
+  const [planning, setPlanning] = useState<PlanningData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [view, setView] = useState<"sessions" | "planning">("sessions");
+  const [selectedRoom, setSelectedRoom] = useState<string | null>(null);
+  const isDark = theme === "dark";
+  const now = new Date();
+  const liveSessions = event?.sessions.filter((session) => now >= new Date(session.start_time) && now <= new Date(session.end_time)) ?? [];
 
-  const sessions = SESSIONS?.filter(s => s.eventId === id) || [];
-  const liveSessions = sessions.filter(isSessionLive);
+  useEffect(() => {
+    const fetchEvent = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`/api/events/${eventId}`);
+        if (!response.ok) {
+          throw new Error("Erreur lors du chargement de l'événement");
+        }
+        const data = await response.json();
+        setEvent(data);
+      } catch (error) {
+        console.error("Erreur lors du chargement de l'événement:", error);
+        setEvent(null);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const startDate = new Date(event.startDate);
-  const endDate = new Date(event.endDate);
-  const dateFormat = new Intl.DateTimeFormat('fr-FR', {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  });
+    if (eventId) {
+      fetchEvent();
+    }
+  }, [eventId]);
 
-  return (
-    <PublicLayout>
-      <div className="max-w-4xl mx-auto">
-        {/* En-tête de l'événement */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground">{event.title}</h1>
-          <p className="text-lg text-muted-foreground mt-2">{event.description}</p>
-          
-          <div className="flex flex-wrap items-center gap-4 mt-4 text-sm">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-              <span>{dateFormat.format(startDate)} - {dateFormat.format(endDate)}</span>
-            </div>
-            
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-              <span>{event.location}</span>
-            </div>
-          </div>
-        </div>
+  useEffect(() => {
+    const fetchPlanning = async () => {
+      try {
+        let url = `/api/events/${eventId}/planning`;
+        if (selectedRoom) {
+          url += `?room=${selectedRoom}`;
+        }
+        const response = await fetch(url);
+        if (response.ok) {
+          const data = await response.json();
+          setPlanning(data);
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement du planning:", error);
+      }
+    };
 
-        {/* Badge sessions en direct */}
-        {liveSessions.length > 0 && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-red-500 live-pulse" />
-              <span className="font-semibold text-red-700 dark:text-red-400">
-                {liveSessions.length} session(s) en cours
-              </span>
-            </div>
-          </div>
-        )}
+    if (eventId && view === "planning") {
+      fetchPlanning();
+    }
+  }, [eventId, view, selectedRoom]);
 
-        {/* Liste des sessions */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold text-foreground">Programme</h2>
-          
-          {sessions.length === 0 ? (
-            <p className="text-muted-foreground">Aucune session prévue pour cet événement.</p>
-          ) : (
-            sessions.map(session => {
-              const isLive = isSessionLive(session);
-              const startTime = new Date(session.startTime);
-              const endTime = new Date(session.endTime);
-              const timeFormat = new Intl.DateTimeFormat('fr-FR', {
-                hour: '2-digit',
-                minute: '2-digit'
-              });
+  const formatDate = (startDate: string, endDate: string) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    return `${start.toLocaleDateString('fr-FR')} — ${end.toLocaleDateString('fr-FR')}`;
+  };
 
-              return (
-                <a
-                  key={session.id}
-                  href={`/session-detail-page?id=${session.id}`}
-                  className="block p-4 bg-card border border-border rounded-lg hover:border-primary/50 transition-colors"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        {isLive && (
-                          <span className="text-xs font-semibold text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30 px-2 py-0.5 rounded-full flex items-center gap-1">
-                            <span className="w-1 h-1 rounded-full bg-red-500" />
-                            LIVE
-                          </span>
-                        )}
-                        <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                          {session.room.name}
-                        </span>
-                        <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                          {session.track}
-                        </span>
-                      </div>
-                      <h3 className="font-semibold text-foreground">{session.title}</h3>
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                        {session.description}
-                      </p>
-                    </div>
-                    <div className="text-right text-sm text-muted-foreground shrink-0">
-                      <div>{timeFormat.format(startTime)} - {timeFormat.format(endTime)}</div>
-                    </div>
-                  </div>
-                  
-                  {/* Intervenants */}
-                  {session.speakers.length > 0 && (
-                    <div className="flex items-center gap-2 mt-3 pt-3 border-t border-border">
-                      <div className="flex -space-x-2">
-                        {session.speakers.slice(0, 3).map(speaker => (
-                          <img
-                            key={speaker.id}
-                            src={speaker.avatar}
-                            alt={speaker.name}
-                            className="w-6 h-6 rounded-full border-2 border-card"
-                          />
-                        ))}
-                      </div>
-                      <span className="text-xs text-muted-foreground">
-                        {session.speakers.map(s => s.name).join(', ')}
-                      </span>
-                    </div>
-                  )}
-                </a>
-              );
-            })
-          )}
+  const formatTime = (startTime: string, endTime: string) => {
+    const start = new Date(startTime);
+    const end = new Date(endTime);
+    return `${start.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} — ${end.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
+  };
+
+  if (loading) {
+    return (
+      <div className={`min-h-screen flex items-center justify-center ${isDark ? "bg-slate-950 text-white" : "bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100"}`}>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600 mx-auto"></div>
+          <p className="mt-4">Chargement de l&apos;événement...</p>
         </div>
       </div>
-    </PublicLayout>
+    );
+  }
+
+  if (!event) {
+    return (
+      <div className={`min-h-screen flex items-center justify-center ${isDark ? "bg-slate-950" : "bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100"}`}>
+        <div className="text-center">
+          <p className="text-xl text-red-500">Événement non trouvé</p>
+          <Link href="/" className="mt-4 inline-block text-violet-600 hover:underline">
+            Retour à l&apos;accueil
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <main className={isDark ? "min-h-screen bg-slate-950 text-slate-100" : "min-h-screen bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100 text-slate-900"}>
+      <div className="mx-auto max-w-7xl px-6 py-8">
+        <header className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <div className={isDark ? "grid h-12 w-12 place-items-center rounded-3xl bg-violet-500 text-slate-950 shadow-[0_20px_50px_rgba(167,139,250,0.3)]" : "grid h-12 w-12 place-items-center rounded-3xl bg-violet-600 text-white shadow-[0_20px_50px_rgba(139,92,246,0.3)]"}>
+              ⚡
+            </div>
+            <span className="text-lg font-semibold">EventSync</span>
+          </div>
+
+          <nav className="flex flex-wrap items-center justify-center gap-4 text-sm">
+            <Link href="/" className={isDark ? "text-slate-300 hover:text-white" : "text-slate-700 hover:text-slate-900"}>
+              Accueil
+            </Link>
+            <Link href="/speakers" className={isDark ? "text-slate-300 hover:text-white" : "text-slate-700 hover:text-slate-900"}>
+              Intervenants
+            </Link>
+            <button
+              onClick={() => setTheme(isDark ? "light" : "dark")}
+              className={isDark ? "rounded-full border border-slate-700 bg-slate-900 px-3 py-2 text-slate-100 transition hover:border-slate-500" : "rounded-full border border-slate-300 bg-white px-3 py-2 text-slate-900 transition hover:border-slate-400"}
+            >
+              {isDark ? "☀️" : "🌙"}
+            </button>
+          </nav>
+        </header>
+
+        <section className={isDark ? "mb-10 rounded-[2rem] bg-slate-900/95 p-10 shadow-2xl" : "mb-10 rounded-[2rem] bg-white/80 p-10 shadow-2xl backdrop-blur-xl"}>
+          <h1 className="text-5xl font-bold tracking-tight">
+            {event.title}
+            <span className="ml-3 text-sm font-mono text-violet-500">(ID: {event.id})</span>
+          </h1>
+          <p className={isDark ? "mt-4 max-w-2xl text-slate-300" : "mt-4 max-w-2xl text-slate-600"}>{event.description}</p>
+
+          <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+            <span className={isDark ? "inline-flex items-center gap-2 rounded-2xl bg-slate-800/80 px-4 py-3 text-sm text-slate-200" : "inline-flex items-center gap-2 rounded-2xl bg-slate-100 px-4 py-3 text-sm text-slate-700"}>
+              📅 {formatDate(event.start_date, event.end_date)}
+            </span>
+            <span className={isDark ? "inline-flex items-center gap-2 rounded-2xl bg-slate-800/80 px-4 py-3 text-sm text-slate-200" : "inline-flex items-center gap-2 rounded-2xl bg-slate-100 px-4 py-3 text-sm text-slate-700"}>
+              📍 {event.place}
+            </span>
+          </div>
+
+          <div className="mt-8 flex flex-wrap items-center gap-4">
+            <button
+              onClick={() => setView("planning")}
+              className="inline-flex items-center gap-2 rounded-full bg-violet-600 px-6 py-3 text-sm font-semibold text-white transition hover:bg-violet-700"
+            >
+              Voir le planning
+            </button>
+            <span className={isDark ? "inline-flex items-center gap-2 rounded-full bg-slate-800/80 px-4 py-3 text-sm text-slate-200" : "inline-flex items-center gap-2 rounded-full bg-slate-100 px-4 py-3 text-sm text-slate-700"}>
+              Salle principale
+            </span>
+          </div>
+
+          <div className="mt-10 flex gap-4">
+            <button
+              onClick={() => setView("sessions")}
+              className={`px-6 py-3 rounded-3xl font-semibold transition ${
+                view === "sessions"
+                  ? "bg-violet-600 text-white"
+                  : isDark ? "bg-slate-800 text-slate-300 hover:bg-slate-700" : "bg-slate-200 text-slate-900 hover:bg-slate-300"
+              }`}
+            >
+              📋 Sessions
+            </button>
+            <button
+              onClick={() => setView("planning")}
+              className={`px-6 py-3 rounded-3xl font-semibold transition ${
+                view === "planning"
+                  ? "bg-violet-600 text-white"
+                  : isDark ? "bg-slate-800 text-slate-300 hover:bg-slate-700" : "bg-slate-200 text-slate-900 hover:bg-slate-300"
+              }`}
+            >
+              📅 Planning
+            </button>
+          </div>
+        </section>
+
+        {view === "sessions" && (
+          <section className="max-w-6xl">
+            {liveSessions.length > 0 && (
+              <div className="mb-10 rounded-3xl border border-rose-500/20 bg-rose-500/5 p-6 shadow-2xl">
+                <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <span className="inline-flex items-center gap-2 rounded-full bg-rose-600/15 px-3 py-1 text-xs font-semibold text-rose-200">
+                      LIVE
+                    </span>
+                    <h2 className="mt-3 text-2xl font-semibold">Sessions en cours ({liveSessions.length})</h2>
+                  </div>
+                  <p className={isDark ? "text-slate-300" : "text-slate-600"}>
+                    {liveSessions.length} session{liveSessions.length > 1 ? "s" : ""} actuellement en direct.
+                  </p>
+                </div>
+                <div className="grid gap-4">
+                  {liveSessions.map((session) => (
+                    <div key={session.id} className={isDark ? "rounded-3xl bg-slate-900 p-6 shadow-xl" : "rounded-3xl bg-white p-6 shadow-xl"}>
+                      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                        <div>
+                          <h3 className="text-xl font-semibold">{session.title}</h3>
+                          <p className={isDark ? "mt-2 text-slate-300" : "mt-2 text-slate-600"}>{session.description}</p>
+                        </div>
+                        <span className="inline-flex items-center gap-2 rounded-full bg-red-500/15 px-3 py-2 text-sm font-semibold text-rose-200">
+                          En direct • {formatTime(session.start_time, session.end_time)}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mb-6 flex flex-wrap items-center gap-4">
+              <span className={isDark ? "rounded-full bg-rose-600/20 px-3 py-1 text-xs font-semibold text-rose-200" : "rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700"}>
+                PROGRAMME
+              </span>
+              <h2 className="text-2xl font-semibold">Sessions ({event.sessions.length})</h2>
+            </div>
+
+            <div className="space-y-4">
+              {event.sessions.map((session) => (
+                <div key={session.id} className={isDark ? "overflow-hidden rounded-2xl bg-slate-800 p-6 shadow-xl" : "overflow-hidden rounded-2xl bg-white p-6 shadow-xl"}>
+                  <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+                    <div className="flex-1">
+                      <h3 className="text-xl font-semibold">{session.title}</h3>
+                      <p className={isDark ? "mt-2 text-slate-300" : "mt-2 text-slate-600"}>{session.description}</p>
+                    </div>
+                  </div>
+
+                  <div className={isDark ? "mt-4 flex flex-wrap gap-2 text-sm text-slate-300" : "mt-4 flex flex-wrap gap-2 text-sm text-slate-600"}>
+                    <span className={isDark ? "rounded-lg bg-slate-700 px-3 py-1" : "rounded-lg bg-slate-100 px-3 py-1"}>
+                      🕒 {formatTime(session.start_time, session.end_time)}
+                    </span>
+                    <span className={isDark ? "rounded-lg bg-slate-700 px-3 py-1" : "rounded-lg bg-slate-100 px-3 py-1"}>
+                      📍 {session.room.name}
+                    </span>
+                    <span className={isDark ? "rounded-lg bg-slate-700 px-3 py-1" : "rounded-lg bg-slate-100 px-3 py-1"}>
+                      👥 {session.room.capacity}
+                    </span>
+                  </div>
+
+                  {session.speakers.length > 0 && (
+                    <div className={isDark ? "mt-4 border-t border-slate-700 pt-4" : "mt-4 border-t border-slate-200 pt-4"}>
+                      <p className={isDark ? "mb-2 text-sm text-slate-400" : "mb-2 text-sm text-slate-600"}>Intervenants:</p>
+                      <div className="space-y-2">
+                        {session.speakers.map((item) => (
+                          <Link href={`/speakers/${item.speaker.id}`} key={item.id_speaker}>
+                            <div className={isDark ? "flex items-center gap-3 rounded-lg bg-slate-700/50 p-3 cursor-pointer hover:bg-slate-700 transition" : "flex items-center gap-3 rounded-lg bg-slate-100 p-3 cursor-pointer hover:bg-slate-200 transition"}>
+                              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-600 text-white text-sm font-bold">
+                                {item.speaker.full_name.charAt(0)}
+                              </div>
+                              <div>
+                                <p className="font-semibold">{item.speaker.full_name}</p>
+                                <p className={isDark ? "text-xs text-slate-400" : "text-xs text-slate-500"}>{item.speaker.biography?.substring(0, 60)}</p>
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {view === "planning" && planning && planning.success && (
+          <section className="max-w-6xl">
+            <div className="mb-6 flex flex-wrap items-center gap-4">
+              <span className={isDark ? "rounded-full bg-blue-600/20 px-3 py-1 text-xs font-semibold text-blue-200" : "rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700"}>
+                PLANNING MULTI-PISTES
+              </span>
+              <h2 className="text-2xl font-semibold">Planning par salle</h2>
+            </div>
+
+            {planning.data.rooms.length > 0 && (
+              <div className="mb-6 flex flex-wrap gap-2">
+                <button
+                  onClick={() => setSelectedRoom(null)}
+                  className={`px-4 py-2 rounded-lg font-medium transition ${
+                    !selectedRoom
+                      ? "bg-violet-600 text-white"
+                      : isDark ? "bg-slate-800 text-slate-300 hover:bg-slate-700" : "bg-slate-200 text-slate-900 hover:bg-slate-300"
+                  }`}
+                >
+                  🏢 Toutes les salles
+                </button>
+
+                {planning.data.rooms.map((room) => (
+                  <button
+                    key={room}
+                    onClick={() => setSelectedRoom(room)}
+                    className={`px-4 py-2 rounded-lg font-medium transition ${
+                      selectedRoom === room
+                        ? "bg-violet-600 text-white"
+                        : isDark ? "bg-slate-800 text-slate-300 hover:bg-slate-700" : "bg-slate-200 text-slate-900 hover:bg-slate-300"
+                    }`}
+                  >
+                    {room}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            <div className="space-y-6">
+              {planning.data.rooms.map((room) => (
+                (!selectedRoom || selectedRoom === room) && (
+                  <div key={room} className={isDark ? "rounded-2xl bg-slate-800/50 p-6" : "rounded-2xl bg-white p-6 shadow-xl"}>
+                    <h3 className="mb-4 text-xl font-bold text-violet-600 flex items-center gap-2">
+                      📍 {room}
+                    </h3>
+                    <div className="space-y-3">
+                      {planning.data.planning[room]?.map((session) => (
+                        <div
+                          key={session.id}
+                          className={`p-4 rounded-lg border-l-4 transition ${
+                            session.isLive
+                              ? isDark
+                                ? "border-red-500 bg-red-500/10"
+                                : "border-red-500 bg-red-50"
+                              : isDark
+                                ? "border-slate-600 bg-slate-700/30"
+                                : "border-slate-300 bg-slate-50"
+                          }`}
+                        >
+                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                {session.isLive && (
+                                  <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-red-500 text-white text-xs font-semibold">
+                                    <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                                    LIVE
+                                  </span>
+                                )}
+                                <h4 className="font-semibold text-lg">{session.title}</h4>
+                              </div>
+                              <p className={isDark ? "mt-1 text-sm text-slate-400" : "mt-1 text-sm text-slate-600"}>{session.description}</p>
+                            </div>
+                            <div className={isDark ? "text-right text-sm text-slate-300" : "text-right text-sm text-slate-600"}>
+                              <div className="font-semibold">{session.timeSlot}</div>
+                            </div>
+                          </div>
+
+                          {session.speakers && session.speakers.length > 0 && (
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {session.speakers.map((item) => (
+                                <Link href={`/speakers/${item.speaker.id}`} key={item.id_speaker}>
+                                  <span className={isDark ? "inline-flex items-center gap-1 px-2 py-1 rounded-full bg-slate-600 text-slate-100 text-xs cursor-pointer hover:bg-slate-500 transition" : "inline-flex items-center gap-1 px-2 py-1 rounded-full bg-slate-200 text-slate-800 text-xs cursor-pointer hover:bg-slate-300 transition"}>
+                                    🎤 {item.speaker.full_name}
+                                  </span>
+                                </Link>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+    </main>
   );
 }

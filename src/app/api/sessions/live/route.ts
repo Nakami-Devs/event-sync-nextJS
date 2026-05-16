@@ -67,8 +67,9 @@ export async function GET(request: NextRequest) {
       }
     })
   } catch (error) {
+    console.error('Erreur lors de la détection des sessions live', error)
     return NextResponse.json(
-      { success: false, error: 'Error detecting live sessions' },
+      { success: false, error: 'Erreur interne du serveur' },
       { status: 500 }
     )
   }
