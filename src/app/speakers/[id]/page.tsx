@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -160,10 +159,9 @@ export default function SpeakerDetailPage() {
             <div className="relative w-32 h-32 rounded-full overflow-hidden bg-gradient-to-r from-violet-500 to-fuchsia-500 p-1">
               <div className="w-full h-full rounded-full bg-white p-1">
                 {speaker.profile_pic ? (
-                  <Image
+                  <img
                     src={speaker.profile_pic}
                     alt={speaker.full_name}
-                    fill
                     className="rounded-full object-cover"
                     sizes="128px"
                   />
