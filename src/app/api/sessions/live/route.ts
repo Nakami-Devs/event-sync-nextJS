@@ -1,3 +1,6 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -21,7 +24,7 @@ export async function GET(request: NextRequest) {
         speakers: true,
         questions: {
           orderBy: {
-            upvotes: 'desc'
+            upvote_numbers: 'desc'
           },
           take: 5
         }
@@ -29,7 +32,7 @@ export async function GET(request: NextRequest) {
     })
     
     const sessionsWithRemainingTime = liveSessions.map(session => {
-      const endTime = new Date(session.endTime)
+      const endTime = new Date(session.end_time)
       const remainingMinutes = Math.max(0, Math.floor((endTime.getTime() - now.getTime()) / 60000))
       const remainingHours = Math.floor(remainingMinutes / 60)
       const remainingMinutesOnly = remainingMinutes % 60
@@ -45,11 +48,11 @@ export async function GET(request: NextRequest) {
             : `${remainingMinutesOnly}min`
         },
         progress: {
-          start: session.startTime,
-          end: session.endTime,
+          start: session.start_time,
+          end: session.end_time,
           percentage: Math.min(100, Math.max(0, 
-            ((now.getTime() - new Date(session.startTime).getTime()) / 
-             (new Date(session.endTime).getTime() - new Date(session.startTime).getTime())) * 100
+            ((now.getTime() - new Date(session.start_time).getTime()) / 
+             (new Date(session.end_time).getTime() - new Date(session.start_time).getTime())) * 100
           ))
         }
       }
@@ -64,8 +67,9 @@ export async function GET(request: NextRequest) {
       }
     })
   } catch (error) {
+    console.error('Erreur lors de la détection des sessions live', error)
     return NextResponse.json(
-      { success: false, error: 'Error detecting live sessions' },
+      { success: false, error: 'Erreur interne du serveur' },
       { status: 500 }
     )
   }

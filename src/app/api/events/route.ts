@@ -1,5 +1,5 @@
 import {NextRequest, NextResponse} from 'next/server';
-import {createPrismaClient} from "@/lib/prisma";
+import {createPrismaClient, prisma} from "@/lib/prisma";
 
 export async function GET() {
   try {
@@ -22,9 +22,9 @@ export async function GET() {
 
     return NextResponse.json(events);
   } catch (error) {
-    console.error('Error retrieving events:', error);
+    console.error('Erreur lors de la récupération des événements: ', error);
     return NextResponse.json(
-      { error: 'Error retrieving events' },
+      { error: 'Erreur interner du serveur' },
       { status: 500 }
     );
   }
@@ -38,15 +38,30 @@ export async function POST(request: NextRequest) {
 
     if (!title || !description || !start_date || !end_date || !place) {
       return NextResponse.json(
-        { error: 'All fields are required' },
+        { error: 'Tous les champs sont requis' },
         { status: 400 }
       );
     }
 
     if (new Date(start_date) >= new Date(end_date)) {
       return NextResponse.json(
-          { message: 'Start date should be before the end date' },
+          { message: 'La date de début doit être avant la date de fin' },
           { status: 400 }
+      )
+    }
+
+    const existingEvent = await prisma.event.findFirst({
+      where: {
+        title,
+        place,
+        start_date: new Date(start_date),
+      }
+    });
+
+    if(existingEvent){
+      return NextResponse.json(
+          { message: `Un événement ${title} existe déjà à ${place} à cette date`},
+          { status: 409 }
       )
     }
 
@@ -62,9 +77,9 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(event, { status: 201 });
   } catch (error) {
-    console.error('Error creating the event', error);
+    console.error('Erreur lors de la création de l\'événement', error);
     return NextResponse.json(
-      { error: 'Error creating the event' },
+      { error: 'Erreur interne du serveur' },
       { status: 500 }
     );
   }

@@ -84,7 +84,6 @@ export default async function SessionDetailPage({
     <main className="min-h-screen bg-[#12132A] text-white">
       <div className="max-w-4xl mx-auto px-6 py-8">
 
-        
         {(() => {
   const status = getSessionStatus(session.start_time, session.end_time)
   if (status === 'live') return (
@@ -104,7 +103,6 @@ export default async function SessionDetailPage({
     </span>
   )
 })()}
-
        
         <h1 className="text-4xl font-bold text-white mb-4">
           {session.title}
