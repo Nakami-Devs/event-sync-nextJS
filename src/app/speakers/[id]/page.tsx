@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import {ThemeToggle} from "./components/ThemeToggle";
+
 
 type Speaker = {
   id: string;
@@ -100,7 +102,7 @@ export default function SpeakerDetailPage() {
           isDark ? "bg-slate-950 text-white" : "bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100"
         }`}
       >
-        Chargement...
+        <p className="mt-4">Chargement de l&apos;intervenant...</p>
       </div>
     );
   }
@@ -134,9 +136,22 @@ export default function SpeakerDetailPage() {
       } p-8`}
     >
       <div className="max-w-4xl mx-auto">
-        <header className="mb-6 flex flex-col gap-4 rounded-3xl bg-white/70 p-5 shadow-xl backdrop-blur-xl dark:bg-slate-900/70 dark:text-slate-100 sm:flex-row sm:items-center sm:justify-between">
+          <nav className="flex justify-between items-center px-6 py-4 border-b border-white/10 backdrop-blur-lg bg-white/5">
+               <h1 className="text-lg font-bold flex items-center gap-2">
+                 ⚡ EventSync
+               </h1>
+         
+               <div className="flex items-center gap-6">
+                 <a href="#" className="hover:text-purple-400">Événements</a>
+                 <a href="#" className="hover:text-purple-400">Favoris</a>
+                 <a href="#" className="hover:text-purple-400">Admin</a>
+         
+                 <ThemeToggle />
+               </div>
+             </nav>
+
+        <header className="bt-5 mb-6 flex flex-col gap-4 rounded-3xl bg-white/70 p-5 shadow-xl backdrop-blur-xl dark:bg-slate-900/70 dark:text-slate-100 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-violet-600">EventSync</p>
             <h1 className="text-3xl font-bold">Détails de l’intervenant</h1>
           </div>
           <div className="flex flex-wrap items-center gap-3">
@@ -146,12 +161,6 @@ export default function SpeakerDetailPage() {
             >
               ← Retour à la liste
             </Link>
-            <button
-              onClick={() => setTheme(isDark ? "light" : "dark")}
-              className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-            >
-              {isDark ? "☀️ Mode clair" : "🌙 Mode sombre"}
-            </button>
           </div>
         </header>
 
