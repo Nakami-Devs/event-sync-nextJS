@@ -61,6 +61,15 @@ function formatDate(dateString: string): string {
   })
 }
 
+function getSessionStatus(startTime: string, endTime: string): 'live' | 'termine' | 'a_venir' {
+  const now   = new Date()
+  const start = new Date(startTime)
+  const end   = new Date(endTime)
+  if (now >= start && now <= end) return 'live'
+  if (now > end)                  return 'termine'
+  return 'a_venir'
+}
+
 export default async function SessionDetailPage({
   params,
 }: {
@@ -75,14 +84,25 @@ export default async function SessionDetailPage({
     <main className="min-h-screen bg-[#12132A] text-white">
       <div className="max-w-4xl mx-auto px-6 py-8">
 
-        
-        {session.is_live && (
-          <span className="inline-flex items-center gap-1.5 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-4">
-            <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
-            LIVE
-          </span>
-        )}
-
+        {(() => {
+  const status = getSessionStatus(session.start_time, session.end_time)
+  if (status === 'live') return (
+    <span className="inline-flex items-center gap-1.5 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-4">
+      <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+      LIVE
+    </span>
+  )
+  if (status === 'termine') return (
+    <span className="inline-flex items-center gap-1.5 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-4">
+      Terminée
+    </span>
+  )
+  return (
+    <span className="inline-flex items-center gap-1.5 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-4">
+      À venir
+    </span>
+  )
+})()}
        
         <h1 className="text-4xl font-bold text-white mb-4">
           {session.title}
