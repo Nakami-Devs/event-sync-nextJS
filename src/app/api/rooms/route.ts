@@ -15,8 +15,9 @@ export async function GET(){
 export async function POST(req: NextRequest){
     try {
         const { name, capacity } = await req.json()
+        const roomCapacity = String(capacity ?? '').trim()
 
-        if (!name || !capacity) {
+        if (!name || !roomCapacity) {
             return NextResponse.json(
                 { message: 'Name and capacity required' },
                 { status: 400 }
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest){
         }
 
         const room = await prisma.room.create({
-            data: { name, capacity }
+            data: { name, capacity: roomCapacity }
         })
 
         return NextResponse.json(room, { status: 201 })
