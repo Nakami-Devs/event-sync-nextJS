@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import {ThemeToggle} from "./components/ThemeToggle";
+import ThemeToggle from "@/components/ThemeToggle";
 
 type Speaker = {
   id: string;
@@ -413,7 +413,6 @@ export default function EventPage() {
             </div>
           </section>
         )}
-      </div>
     </main>
   );
 }
