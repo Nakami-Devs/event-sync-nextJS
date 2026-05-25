@@ -1,0 +1,1247 @@
+openapi: 3.1.0
+info:
+  title: Spécification OAS - EventSync
+  description: |
+    API EventSync pour la gestion d'événements, intervenants, salles, sessions 
+    et un système de questions/réponses. Authentification admin requise
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:3000/api'
+
+paths:
+  /admin/login:
+    post:
+      tags:
+        - Admin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        200:
+          description: Admin connecté avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Connexion réussie
+        400:
+          description: Informations requises incomplètes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: L'email et le mot de passe sont requis
+        401:
+          description: Accès non autorisé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Mot de passe incorrect
+        404:
+          description: Admin non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Aucun admin trouvé avec cet email
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+
+  /events:
+    get:
+      tags:
+        - Événement
+        - Accès public
+      responses:
+        200:
+          description: Liste de tous les événements
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Event"
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+    post:
+      tags:
+        - Événement
+        - Accès admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - description
+                - start_date
+                - end_date
+                - place
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                start_date:
+                  type: string
+                  format: date-time
+                end_date:
+                  type: string
+                  format: date-time
+                place:
+                  type: string
+      responses:
+        201:
+          description: Événement créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        400:
+          description: Informations requises incomplètes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Tous les champs sont requis
+        409:
+          description: Un événement identique existe déjà
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Un événement avec ce titre existe déjà à cette date
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+
+  /events/{id}:
+    get:
+      tags:
+        - Événement
+        - Accès public
+      parameters:
+        - $ref: "#/components/parameters/EventIdentifierPathVariable"
+      responses:
+        200:
+          description: Événement spécifique par id avec ses informations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        404:
+          description: Événement non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Événement non trouvé
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+    put:
+      tags:
+        - Événement
+        - Accès admin
+      parameters:
+        - $ref: "#/components/parameters/EventIdentifierPathVariable"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                start_date:
+                  type: string
+                  format: date-time
+                end_date:
+                  type: string
+                  format: date-time
+                place:
+                  type: string
+      responses:
+        200:
+          description: Événement mis à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        404:
+          description: Événement non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Événement non trouvé
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+    delete:
+      tags:
+        - Événement
+        - Accès admin
+      parameters:
+        - $ref: "#/components/parameters/EventIdentifierPathVariable"
+      responses:
+        200:
+          description: Événement supprimé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Événement supprimé avec succès
+        404:
+          description: Événement non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Événement non trouvé
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+
+  /events/{id}/planning:
+    get:
+      tags:
+        - Événement
+        - Accès public
+      parameters:
+        - $ref: "#/components/parameters/EventIdentifierPathVariable"
+      responses:
+        200:
+          description: Planning de l'événement organisé par salle
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: object
+                    properties:
+                      eventId:
+                        type: string
+                        format: uuid
+                      rooms:
+                        type: array
+                        items:
+                          type: string
+                      planning:
+                        type: object
+                        additionalProperties:
+                          type: array
+                          items:
+                            $ref: "#/components/schemas/Session"
+                      currentTime:
+                        type: string
+                        format: date-time
+        404:
+          description: Événement non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Événement non trouvé
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur lors de la récupération du planning
+
+  /rooms:
+    get:
+      tags:
+        - Salle
+        - Accès public
+      responses:
+        200:
+          description: Liste de toutes les salles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Room"
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+    post:
+      tags:
+        - Salle
+        - Accès admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - capacity
+              properties:
+                name:
+                  type: string
+                capacity:
+                  type: integer
+      responses:
+        201:
+          description: Salle créée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+        400:
+          description: Informations requises incomplètes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Le nom et la capacité sont requis
+        409:
+          description: Une salle avec ce nom existe déjà
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Une salle avec ce nom existe déjà
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+
+  /rooms/{id}:
+    get:
+      tags:
+        - Salle
+        - Accès public
+      parameters:
+        - $ref: "#/components/parameters/RoomIdentifierPathVariable"
+      responses:
+        200:
+          description: Salle spécifique par id avec ses informations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+        404:
+          description: Salle introuvable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Salle introuvable
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+    put:
+      tags:
+        - Salle
+        - Accès admin
+      parameters:
+        - $ref: "#/components/parameters/RoomIdentifierPathVariable"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                capacity:
+                  type: integer
+      responses:
+        200:
+          description: Salle mise à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+        404:
+          description: Salle introuvable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Salle introuvable
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+    delete:
+      tags:
+        - Salle
+        - Accès admin
+      parameters:
+        - $ref: "#/components/parameters/RoomIdentifierPathVariable"
+      responses:
+        200:
+          description: Salle supprimée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Salle supprimée avec succès
+        404:
+          description: Salle introuvable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Salle introuvable
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+
+  /rooms/{id}/sessions:
+    get:
+      tags:
+        - Salle
+        - Accès public
+      parameters:
+        - $ref: "#/components/parameters/RoomIdentifierPathVariable"
+      responses:
+        200:
+          description: Liste des sessions dans une salle spécifique
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Session"
+        404:
+          description: Salle introuvable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Salle introuvable
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+
+  /sessions:
+    get:
+      tags:
+        - Session
+        - Accès public
+      responses:
+        200:
+          description: Liste de toutes les sessions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Session"
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+    post:
+      tags:
+        - Session
+        - Accès admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - description
+                - start_time
+                - end_time
+                - id_event
+                - id_room
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                start_time:
+                  type: string
+                  format: date-time
+                end_time:
+                  type: string
+                  format: date-time
+                id_event:
+                  type: string
+                  format: uuid
+                id_room:
+                  type: string
+                  format: uuid
+                speaker_ids:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        201:
+          description: Session créée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        400:
+          description: Informations requises incomplètes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: "Champs obligatoires manquants : title, description, start_time, end_time, id_event, id_room"
+        409:
+          description: Une session identique existe déjà dans cet événement
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Une session avec ce titre existe déjà dans cet événement
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur serveur interne
+
+  /sessions/{id}:
+    get:
+      tags:
+        - Session
+        - Accès public
+      parameters:
+        - $ref: "#/components/parameters/SessionIdentifierPathVariable"
+      responses:
+        200:
+          description: Session spécifique par id avec ses informations
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        404:
+          description: Session introuvable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Session introuvable
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+    put:
+      tags:
+        - Session
+        - Accès admin
+      parameters:
+        - $ref: "#/components/parameters/SessionIdentifierPathVariable"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                start_time:
+                  type: string
+                  format: date-time
+                end_time:
+                  type: string
+                  format: date-time
+                id_room:
+                  type: string
+                  format: uuid
+                speaker_ids:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+      responses:
+        200:
+          description: Session mise à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Session"
+        404:
+          description: Session introuvable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Session introuvable
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+    delete:
+      tags:
+        - Session
+        - Accès admin
+      parameters:
+        - $ref: "#/components/parameters/SessionIdentifierPathVariable"
+      responses:
+        200:
+          description: Session supprimée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Session supprimée avec succès
+        404:
+          description: Session introuvable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Session introuvable
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+
+  /sessions/{id}/questions:
+    get:
+      tags:
+        - Session
+        - Accès public
+      parameters:
+        - $ref: "#/components/parameters/SessionIdentifierPathVariable"
+      responses:
+        200:
+          description: Liste des questions d'une session triées par upvotes décroissants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Question"
+        404:
+          description: Session introuvable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Session introuvable
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+
+  /sessions/live:
+    get:
+      tags:
+        - Session
+        - Accès public
+      responses:
+        200:
+          description: Liste des sessions actuellement en cours
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Session"
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur lors de la détection des sessions live
+
+  /questions:
+    post:
+      tags:
+        - Question
+        - Accès public
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - content
+                - id_session
+              properties:
+                content:
+                  type: string
+                name:
+                  type: string
+                  default: ANONYM
+                id_session:
+                  type: string
+                  format: uuid
+      responses:
+        201:
+          description: Question soumise avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Question"
+        400:
+          description: Informations requises incomplètes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Le contenu et l'id de la session sont requis
+        403:
+          description: La session n'est pas en cours
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Les questions ne peuvent être soumises que pendant une session live
+        404:
+          description: Session introuvable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Session introuvable
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+
+  /questions/{id}/upvote:
+    patch:
+      tags:
+        - Question
+        - Accès public
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+      responses:
+        200:
+          description: Upvote ajouté avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Question"
+        404:
+          description: Question introuvable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Question introuvable
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+
+  /speakers:
+    get:
+      tags:
+        - Intervenant
+        - Accès public
+      responses:
+        200:
+          description: Liste de tous les intervenants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Speaker"
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+    post:
+      tags:
+        - Intervenant
+        - Accès admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - full_name
+                - profile_pic
+                - biography
+                - external_links
+              properties:
+                full_name:
+                  type: string
+                profile_pic:
+                  type: string
+                biography:
+                  type: string
+                external_links:
+                  type: string
+      responses:
+        201:
+          description: Intervenant créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Speaker"
+        400:
+          description: Informations requises incomplètes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Tous les champs sont requis
+        409:
+          description: Un intervenant avec ce nom existe déjà
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Un intervenant avec le nom Jean Dupont existe déjà
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+
+  /speakers/{id}:
+    get:
+      tags:
+        - Intervenant
+        - Accès public
+      parameters:
+        - $ref: "#/components/parameters/SpeakerIdentifierPathVariable"
+      responses:
+        200:
+          description: Intervenant spécifique par id avec ses informations et sessions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Speaker"
+        404:
+          description: Intervenant introuvable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Intervenant introuvable
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+    put:
+      tags:
+        - Intervenant
+        - Accès admin
+      parameters:
+        - $ref: "#/components/parameters/SpeakerIdentifierPathVariable"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                full_name:
+                  type: string
+                profile_pic:
+                  type: string
+                biography:
+                  type: string
+                external_links:
+                  type: string
+      responses:
+        200:
+          description: Intervenant mis à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Speaker"
+        404:
+          description: Intervenant introuvable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Intervenant introuvable
+        409:
+          description: Un intervenant avec ce nom existe déjà
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Un intervenant avec ce nom existe déjà
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+    delete:
+      tags:
+        - Intervenant
+        - Accès admin
+      parameters:
+        - $ref: "#/components/parameters/SpeakerIdentifierPathVariable"
+      responses:
+        200:
+          description: Intervenant supprimé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Intervenant supprimé avec succès
+        404:
+          description: Intervenant introuvable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Intervenant introuvable
+        500:
+          description: Erreur interne du serveur
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageErreur"
+              example:
+                message: Erreur interne du serveur
+
+components:
+  parameters:
+    EventIdentifierPathVariable:
+      in: path
+      name: id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: Identifiant unique de l'événement
+    SessionIdentifierPathVariable:
+      in: path
+      name: id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: Identifiant unique de la session
+    RoomIdentifierPathVariable:
+      in: path
+      name: id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: Identifiant unique de la salle
+    SpeakerIdentifierPathVariable:
+      in: path
+      name: id
+      schema:
+        type: string
+        format: uuid
+      required: true
+      description: Identifiant unique de l'intervenant
+
+  schemas:
+    MessageErreur:
+      type: object
+      properties:
+        message:
+          type: string
+    Speaker:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        full_name:
+          type: string
+        profile_pic:
+          type: string
+        biography:
+          type: string
+        external_links:
+          type: string
+        sessions:
+          type: array
+          items:
+            $ref: "#/components/schemas/SessionSpeaker"
+    Admin:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+    Event:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        start_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        place:
+          type: string
+        sessions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Session"
+    Room:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        capacity:
+          type: integer
+        sessions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Session"
+    Session:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        start_time:
+          type: string
+          format: date-time
+        end_time:
+          type: string
+          format: date-time
+        id_event:
+          type: string
+          format: uuid
+        id_room:
+          type: string
+          format: uuid
+        isLive:
+          type: boolean
+        speakers:
+          type: array
+          items:
+            $ref: "#/components/schemas/SessionSpeaker"
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Question"
+    Question:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        content:
+          type: string
+        name:
+          type: string
+          default: ANONYM
+        upvote_numbers:
+          type: integer
+          default: 0
+        creation_datetime:
+          type: string
+          format: date-time
+        id_session:
+          type: string
+          format: uuid
+    SessionSpeaker:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        id_session:
+          type: string
+          format: uuid
+        speaker:
+          $ref: "#/components/schemas/Speaker"
