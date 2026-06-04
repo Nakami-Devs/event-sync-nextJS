@@ -20,7 +20,14 @@ export async function GET() {
       orderBy: { start_date: 'asc' }
     });
 
-    return NextResponse.json(events);
+    const total = events.length;
+
+    return NextResponse.json(events, {
+      status: 200,
+      headers: {
+        'X-Total-Count': total.toString(),
+      }
+    })
   } catch (error) {
     console.error('Erreur lors de la récupération des événements: ', error);
     return NextResponse.json(
