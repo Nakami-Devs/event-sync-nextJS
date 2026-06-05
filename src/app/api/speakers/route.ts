@@ -19,7 +19,15 @@ export async function GET() {
             },
             orderBy: {full_name: 'asc'},
         });
-        return NextResponse.json(speakers, {status: 200});
+
+        const total = speakers.length;
+
+        return NextResponse.json(speakers, {
+            status: 200,
+            headers: {
+                'X-Total-Count': total.toString(),
+            }
+        })
     } catch (error) {
         console.error('Erreur lors de la récupération des intervenants:', error);
         return NextResponse.json(

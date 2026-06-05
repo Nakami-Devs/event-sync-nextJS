@@ -6,7 +6,14 @@ export async function GET(){
         const rooms = await prisma.room.findMany({
             orderBy: { name: 'asc' }
         })
-        return NextResponse.json(rooms, { status: 200 })
+        const total = rooms.length;
+
+        return NextResponse.json(rooms, {
+            status: 200,
+            headers: {
+                'X-Total-Count': total.toString(),
+            }
+        })
     } catch (error) {
         console.error('Erreur lors de la récupération des salles', error)
         return NextResponse.json({ message: 'Erreur interne du serveur' }, { status: 500 })
