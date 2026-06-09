@@ -9,8 +9,8 @@ export async function GET(request: NextRequest) {
     const now = new Date()
     
     const whereCondition: any = {
-      startTime: { lte: now },
-      endTime: { gte: now }
+      start_time: { lte: now },
+      end_time: { gte: now }
     }
     
     if (eventId) {
