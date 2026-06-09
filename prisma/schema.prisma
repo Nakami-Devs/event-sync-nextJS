@@ -46,7 +46,7 @@ model Event {
 model Room {
   id       String    @id @default(uuid())
   name     String
-  capacity String
+  capacity Int @default(0)
   sessions Session[]
 
   @@map("room")
