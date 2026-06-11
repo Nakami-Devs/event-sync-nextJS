@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import Navbar from "@/components/Navbar";
 
 type Speaker = {
   id: string;
@@ -136,10 +137,10 @@ export default function EventPage() {
 
   if (loading) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${isDark ? "bg-slate-950 text-white" : "bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100"}`}>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600 mx-auto"></div>
-          <p className="mt-4">Chargement de l&apos;événement...</p>
+          <p className="mt-4 text-slate-700">Chargement de l'événement...</p>
         </div>
       </div>
     );
@@ -147,7 +148,8 @@ export default function EventPage() {
 
   if (!event) {
     return (
-      <div className={`min-h-screen flex items-center justify-center ${isDark ? "bg-slate-950" : "bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100"}`}>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100">
+        <Navbar />
         <div className="text-center">
           <p className="text-xl text-red-500">Événement non trouvé</p>
           <Link href="/" className="mt-4 inline-block text-violet-600 hover:underline">
@@ -160,31 +162,9 @@ export default function EventPage() {
 
   return (
     <main className={isDark ? "min-h-screen bg-slate-950 text-slate-100" : "min-h-screen bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100 text-slate-900"}>
-      <div className="mx-auto max-w-7xl px-6 py-8">
-        <header className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <div className={isDark ? "grid h-12 w-12 place-items-center rounded-3xl bg-violet-500 text-slate-950 shadow-[0_20px_50px_rgba(167,139,250,0.3)]" : "grid h-12 w-12 place-items-center rounded-3xl bg-violet-600 text-white shadow-[0_20px_50px_rgba(139,92,246,0.3)]"}>
-              ⚡
-            </div>
-            <span className="text-lg font-semibold">EventSync</span>
-          </div>
+      <Navbar />
 
-          <nav className="flex flex-wrap items-center justify-center gap-4 text-sm">
-            <Link href="/" className={isDark ? "text-slate-300 hover:text-white" : "text-slate-700 hover:text-slate-900"}>
-              Accueil
-            </Link>
-            <Link href="/speakers" className={isDark ? "text-slate-300 hover:text-white" : "text-slate-700 hover:text-slate-900"}>
-              Intervenants
-            </Link>
-            <button
-              onClick={() => setTheme(isDark ? "light" : "dark")}
-              className={isDark ? "rounded-full border border-slate-700 bg-slate-900 px-3 py-2 text-slate-100 transition hover:border-slate-500" : "rounded-full border border-slate-300 bg-white px-3 py-2 text-slate-900 transition hover:border-slate-400"}
-            >
-              {isDark ? "☀️" : "🌙"}
-            </button>
-          </nav>
-        </header>
-
+      <div className="mx-auto max-w-7xl px-6 py-8 pt-24">
         <section className={isDark ? "mb-10 rounded-[2rem] bg-slate-900/95 p-10 shadow-2xl" : "mb-10 rounded-[2rem] bg-white/80 p-10 shadow-2xl backdrop-blur-xl"}>
           <h1 className="text-5xl font-bold tracking-tight">
             {event.title}
