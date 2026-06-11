@@ -135,7 +135,6 @@ export default function EventPage() {
     return `${start.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} — ${end.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
   };
 
-  // ========== SPINNER DE CHARGEMENT ==========
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100">
