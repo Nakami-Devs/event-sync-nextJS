@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
+import { ArrowLeft } from 'lucide-react'
 
 type Speaker = {
   id:             string
@@ -32,9 +33,18 @@ export default async function SpeakersPage() {
       <div className="max-w-6xl mx-auto mt-12">
 
         
-        <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent mb-2">
-          Intervenants
-        </h1>
+        <div className="flex items-center gap-3 mb-2">
+  <Link
+    href="/"
+    className="flex items-center justify-center w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 transition-all duration-200 border border-white/10"
+    title="Retour à l'accueil"
+  >
+    <ArrowLeft size={20} className="text-white" />
+  </Link>
+  <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-400 to-blue-400 bg-clip-text text-transparent">
+    Intervenants
+  </h1>
+</div>
         <p className="text-gray-400 mb-10">
           {speakers.length} intervenant{speakers.length > 1 ? 's' : ''} au total
         </p>
