@@ -93,7 +93,7 @@ export default function SpeakerDetailPage() {
     }
   };
 
-  // Style de chargement
+  // ========== SPINNER DE CHARGEMENT ==========
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100">
