@@ -93,10 +93,9 @@ export default function SpeakerDetailPage() {
     }
   };
 
-  // ========== SPINNER DE CHARGEMENT ==========
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100">
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-violet-50 via-fuchsia-50 to-slate-100">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600 mx-auto"></div>
           <p className="mt-4 text-slate-700">Chargement de l'intervenant...</p>
@@ -109,7 +108,7 @@ export default function SpeakerDetailPage() {
     return (
       <div
         className={`min-h-screen flex items-center justify-center text-red-500 ${
-          isDark ? "bg-slate-950" : "bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100"
+          isDark ? "bg-slate-950" : "bg-inear-to-b from-violet-50 via-fuchsia-50 to-slate-100"
         }`}
       >
         <Navbar />
@@ -131,7 +130,7 @@ export default function SpeakerDetailPage() {
       className={`min-h-screen ${
         isDark
           ? "bg-slate-950 text-slate-100"
-          : "bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100 text-slate-900"
+          : "bg-linear-to-b from-violet-50 via-fuchsia-50 to-slate-100 text-slate-900"
       }`}
     >
       <Navbar />
@@ -139,7 +138,7 @@ export default function SpeakerDetailPage() {
       <div className="max-w-4xl mx-auto p-8 pt-24">
         <div className={`${isDark ? "bg-[#1a1a2e]" : "bg-white"} rounded-2xl shadow-xl p-8`}>
           <div className="flex flex-col md:flex-row items-center gap-6">
-            <div className="relative w-32 h-32 rounded-full overflow-hidden bg-gradient-to-r from-violet-500 to-fuchsia-500 p-1">
+            <div className="relative w-32 h-32 rounded-full overflow-hidden bg-linear-to-r from-violet-500 to-fuchsia-500 p-1">
               <div className="w-full h-full rounded-full bg-white p-1">
                 {speaker.profile_pic ? (
                   <img
@@ -227,18 +226,6 @@ export default function SpeakerDetailPage() {
           )}
 
           <div className="mt-8 flex gap-3">
-            <button
-              onClick={() => router.push(`/speakers/${speaker.id}/edit`)}
-              className="px-6 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-medium transition"
-            >
-              Modifier
-            </button>
-            <button
-              onClick={handleDelete}
-              className="px-6 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-medium transition"
-            >
-              Supprimer
-            </button>
             <button
               onClick={() => router.push("/speakers")}
               className="px-6 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 transition"

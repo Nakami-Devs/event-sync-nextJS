@@ -135,10 +135,9 @@ export default function EventPage() {
     return `${start.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })} — ${end.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`;
   };
 
-  // ========== SPINNER DE CHARGEMENT ==========
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100">
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-violet-50 via-fuchsia-50 to-slate-100">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600 mx-auto"></div>
           <p className="mt-4 text-slate-700">Chargement de l'événement...</p>
@@ -149,7 +148,7 @@ export default function EventPage() {
 
   if (!event) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100">
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-b from-violet-50 via-fuchsia-50 to-slate-100">
         <Navbar />
         <div className="text-center">
           <p className="text-xl text-red-500">Événement non trouvé</p>
@@ -162,11 +161,11 @@ export default function EventPage() {
   }
 
   return (
-    <main className={isDark ? "min-h-screen bg-slate-950 text-slate-100" : "min-h-screen bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100 text-slate-900"}>
+    <main className={isDark ? "min-h-screen bg-slate-950 text-slate-100" : "min-h-screen bg-linear-to-b from-violet-50 via-fuchsia-50 to-slate-100 text-slate-900"}>
       <Navbar />
 
       <div className="mx-auto max-w-7xl px-6 py-8 pt-24">
-        <section className={isDark ? "mb-10 rounded-[2rem] bg-slate-900/95 p-10 shadow-2xl" : "mb-10 rounded-[2rem] bg-white/80 p-10 shadow-2xl backdrop-blur-xl"}>
+        <section className={isDark ? "mb-10 rounded-4xl bg-slate-900/95 p-10 shadow-2xl" : "mb-10 rounded-4xl bg-white/80 p-10 shadow-2xl backdrop-blur-xl"}>
           <h1 className="text-5xl font-bold tracking-tight">
             {event.title}
             <span className="ml-3 text-sm font-mono text-violet-500">(ID: {event.id})</span>
