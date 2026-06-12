@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import Navbar from "@/components/Navbar";
 
 type Speaker = {
   id: string;
@@ -94,12 +95,11 @@ export default function SpeakerDetailPage() {
 
   if (loading) {
     return (
-      <div
-        className={`min-h-screen flex items-center justify-center ${
-          isDark ? "bg-slate-950 text-white" : "bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100"
-        }`}
-      >
-        Chargement...
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600 mx-auto"></div>
+          <p className="mt-4 text-slate-700">Chargement de l'intervenant...</p>
+        </div>
       </div>
     );
   }
@@ -111,6 +111,7 @@ export default function SpeakerDetailPage() {
           isDark ? "bg-slate-950" : "bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100"
         }`}
       >
+        <Navbar />
         <div className="text-center">
           <p className="text-xl">Intervenant non trouvé</p>
           <Link
@@ -130,30 +131,11 @@ export default function SpeakerDetailPage() {
         isDark
           ? "bg-slate-950 text-slate-100"
           : "bg-gradient-to-b from-violet-50 via-fuchsia-50 to-slate-100 text-slate-900"
-      } p-8`}
+      }`}
     >
-      <div className="max-w-4xl mx-auto">
-        <header className="mb-6 flex flex-col gap-4 rounded-3xl bg-white/70 p-5 shadow-xl backdrop-blur-xl dark:bg-slate-900/70 dark:text-slate-100 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-violet-600">EventSync</p>
-            <h1 className="text-3xl font-bold">Détails de l’intervenant</h1>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <Link
-              href="/speakers"
-              className="rounded-full border border-violet-200 bg-white px-4 py-2 text-sm font-medium text-violet-700 transition hover:bg-violet-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-            >
-              ← Retour à la liste
-            </Link>
-            <button
-              onClick={() => setTheme(isDark ? "light" : "dark")}
-              className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-            >
-              {isDark ? "☀️ Mode clair" : "🌙 Mode sombre"}
-            </button>
-          </div>
-        </header>
+      <Navbar />
 
+      <div className="max-w-4xl mx-auto p-8 pt-24">
         <div className={`${isDark ? "bg-[#1a1a2e]" : "bg-white"} rounded-2xl shadow-xl p-8`}>
           <div className="flex flex-col md:flex-row items-center gap-6">
             <div className="relative w-32 h-32 rounded-full overflow-hidden bg-gradient-to-r from-violet-500 to-fuchsia-500 p-1">
@@ -256,10 +238,15 @@ export default function SpeakerDetailPage() {
             >
               Supprimer
             </button>
+            <button
+              onClick={() => router.push("/speakers")}
+              className="px-6 py-2 rounded-xl border border-slate-300 hover:bg-slate-100 transition"
+            >
+              ← Retour à la liste
+            </button>
           </div>
         </div>
       </div>
     </div>
   );
 }
-
