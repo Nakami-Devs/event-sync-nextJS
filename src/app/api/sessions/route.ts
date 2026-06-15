@@ -39,3 +39,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Erreur serveur interne' }, { status: 500 })
   }
 }
+
+export async function GET(request: NextRequest) {
+    const eventId = request.nextUrl.searchParams.get('eventId')
+
+    if (!eventId) {
+        return NextResponse.json(
+            { error: 'eventId query parameter is required' },
+            { status: 400 }
+        )
+    }
+
+    const sessions = await prisma.session.findMany({
+        where: { id_event: eventId },
+        include: { room: true, speakers: { include: { speaker: true } } }
+    })
+    
+    const response = NextResponse.json(sessions)
+    response.headers.set('X-Total-Count', sessions.length.toString())
+    return response
+}
