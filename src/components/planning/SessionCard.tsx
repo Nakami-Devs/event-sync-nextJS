@@ -7,6 +7,14 @@ type Props = {
   isLive?: boolean
 }
 
+function formatTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString("fr-FR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  })
+}
+
+
 export default function SessionCard({
   title,
   start,
@@ -15,10 +23,6 @@ export default function SessionCard({
   speaker,
   isLive = false
 }: Props) {
-
-  const speakerText = Array.isArray(speaker)
-    ? speaker.join(", ")
-    : speaker
 
   return (
     <div className="relative bg-white/5 border border-white/10 rounded-2xl p-4 backdrop-blur-xl hover:bg-white/10 transition">
@@ -30,7 +34,7 @@ export default function SessionCard({
       )}
 
       <p className="text-xs text-purple-400">
-        {start} - {end}
+        {formatTime(start)} - {formatTime(end)}
       </p>
 
       <h3 className="text-md font-semibold mt-2">
@@ -44,7 +48,7 @@ export default function SessionCard({
       )}
 
       <p className="text-sm text-gray-400 mt-2">
-        👤 {speakerText}
+        👤 {speaker}
       </p>
 
     </div>
