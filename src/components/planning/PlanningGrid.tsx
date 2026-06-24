@@ -35,7 +35,7 @@ export default function PlanningGrid({eventId}: {eventId: string}) {
               <div className="space-y-4">
 
                 {sessions
-                  .filter((session: { id_room: string }) => session.id_room === room.id)
+                  .filter((session) => session.room.id === room.id)
                   .map((session: Session) => (
 
                     <SessionCard
