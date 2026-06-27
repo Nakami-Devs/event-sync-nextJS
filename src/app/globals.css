@@ -4,12 +4,16 @@
   color-scheme: light;
   --background: #ffffff;
   --foreground: #111827;
+  --hero-text: #111827;
+  --page-gradient: linear-gradient(to bottom right, #ffffff, #f8fafc, #eef2ff)
 }
 
 html.dark {
   color-scheme: dark;
-  --background: #020617;
-  --foreground: #f8fafc;
+  --background: #1e0841;
+  --foreground: #FAFAFA;
+  --hero-text: #ffffff;
+  --page-gradient: linear-gradient(to bottom right, #0f172a, #1e1b4b, #020617);
 }
 
 body {
