@@ -41,17 +41,17 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-    const eventId = request.nextUrl.searchParams.get('eventId')
+    const id_event = request.nextUrl.searchParams.get('id_event')
 
-    if (!eventId) {
+    if (!id_event) {
         return NextResponse.json(
-            { error: 'eventId query parameter is required' },
+            { error: 'id_event query parameter is required' },
             { status: 400 }
         )
     }
 
     const sessions = await prisma.session.findMany({
-        where: { id_event: eventId },
+        where: { id_event: id_event },
         include: { room: true, speakers: { include: { speaker: true } } }
     })
     
