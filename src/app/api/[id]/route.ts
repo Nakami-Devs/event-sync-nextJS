@@ -37,7 +37,7 @@ export async function GET(
 
     const now = new Date()
 
-    const sessionsWithLiveStatus = event.sessions.map(session => ({
+    const sessionsWithLiveStatus = event.sessions.map((session: (typeof event.sessions)[number]) => ({
       ...session,
       isLive:
         now >= new Date(session.start_time) &&
