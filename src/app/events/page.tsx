@@ -1,4 +1,4 @@
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/navbar/Navbar";
 import EventCard from "@/components/events/EventCard";
 import {getEvents} from "@/lib/api/events";
 import PageHeader from "@/components/PageHeader";
@@ -8,7 +8,7 @@ export default async function EventPage() {
     const events = await getEvents();
 
     return (
-        <main className="min-h-screen bg-linear-to-br from-[#0f172a] via-[#1e1b4b] to-[#020617] text-white p-8">
+        <main className="min-h-screen p-8" style={{ background: "var(--page-gradient)",color: "var(--foreground)",}}>
             <Navbar/>
             <div className="max-w-6xl mx-auto mt-12">
                 <PageHeader title="Événements" count={events.length} singular="événement"/>
