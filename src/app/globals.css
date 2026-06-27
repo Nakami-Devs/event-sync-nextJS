@@ -2,10 +2,18 @@
 
 :root {
   color-scheme: light;
-  --background: #ffffff;
+  --background: #FAFAFA;
   --foreground: #111827;
   --hero-text: #111827;
-  --page-gradient: linear-gradient(to bottom right, #ffffff, #f8fafc, #eef2ff)
+  --page-gradient: linear-gradient(to bottom right, #ffffff, #f8fafc, #eef2ff);
+
+  --glass-bg: rgba(0, 0, 0, 0.05);
+  --glass-hover: rgba(0, 0, 0, 0.10);
+  --glass-border: rgba(0, 0, 0, 0.10);
+
+  --card-bg: rgba(0, 0, 0, 0.04);
+  --card-border: rgba(0, 0, 0, 0.10);
+  --card-hover: rgba(0, 0, 0, 0.08);
 }
 
 html.dark {
@@ -14,6 +22,14 @@ html.dark {
   --foreground: #FAFAFA;
   --hero-text: #ffffff;
   --page-gradient: linear-gradient(to bottom right, #0f172a, #1e1b4b, #020617);
+  
+  --glass-bg: rgba(255, 255, 255, 0.10);
+  --glass-hover: rgba(255, 255, 255, 0.20);
+  --glass-border: rgba(255, 255, 255, 0.10);
+
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-border: rgba(255, 255, 255, 0.10);
+  --card-hover: rgba(255, 255, 255, 0.10);
 }
 
 body {
