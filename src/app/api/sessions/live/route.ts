@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
       }
     })
     
-    const sessionsWithRemainingTime = liveSessions.map(session => {
+    const sessionsWithRemainingTime = liveSessions.map((session: any) => {
       const endTime = new Date(session.end_time)
       const remainingMinutes = Math.max(0, Math.floor((endTime.getTime() - now.getTime()) / 60000))
       const remainingHours = Math.floor(remainingMinutes / 60)
