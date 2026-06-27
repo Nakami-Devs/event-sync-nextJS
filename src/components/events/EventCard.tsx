@@ -9,9 +9,8 @@ interface EventCardProps {
 export default async function EventCard({event}: EventCardProps) {
     return (
         <Link href={`/Event/${event.id}`}>
-            <div
-                className="flex flex-col gap-3 bg-white/5 border border-white/10 border-t-6 border-t-purple-800 border-t-linear-to-r
-                        backdrop-blur-xl hover:scale-105 hover:border-violet-400 transition-all duration-300 cursor-pointer h-full rounded-2xl p-5">
+            <div className="flex flex-col gap-3 bg-[var(--card-bg)] border border-[var(--card-border)] border-t-6 border-t-purple-800 
+            border-t-linear-to-r backdrop-blur-xl hover:scale-105 hover:border-violet-400 transition-all duration-300 cursor-pointer h-full rounded-2xl p-5">
                 <h1 className="text-2xl font-bold">{event.title}</h1>
                 <p>{event.description}</p>
                 <div className="flex items-center gap-1 text-[12px]">

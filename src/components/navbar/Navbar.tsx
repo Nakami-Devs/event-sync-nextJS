@@ -17,11 +17,8 @@ export default function Navbar() {
         border-b
         backdrop-blur-lg
 
-        bg-white text-gray-900 border-gray-200
-        dark:bg-slate-900 dark:text-white dark:border-slate-700
-
-        transition-colors duration-300
-      "
+       bg-white/70 dark:bg-slate-950/60 text-gray-900 dark:text-white border-gray-200/50
+      dark:border-white/10 transition-colors duration-300"
     >
       <h1 className="text-lg font-bold flex items-center gap-2">
         ⚡ EventSync
