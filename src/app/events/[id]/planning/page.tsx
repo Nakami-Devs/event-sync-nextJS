@@ -1,5 +1,5 @@
 import PlanningGrid from "@/components/planning/PlanningGrid"
-import Navbar from "@/components/Navbar"
+import Navbar from "@/components/navbar/Navbar"
 
 export default  async function PlanningPage({params}: {params: Promise<{id: string}>}) {
   const {id} = await params;
