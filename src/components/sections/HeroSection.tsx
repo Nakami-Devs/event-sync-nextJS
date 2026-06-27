@@ -54,19 +54,20 @@ export default async function HeroSection() {
       </p>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-14 w-full max-w-5xl">
-         <Link href="/events">
-            <div className="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-xl hover:scale-105 transition-all duration-300">
-              <div className="flex justify-center mb-4">
-                <CalendarDays size={38} className="text-purple-400" />
-              </div>
-              <h2 className="text-3xl font-bold">{eventCount}</h2>
-              <p className="text-gray-400 mt-2">Événements à venir</p>
+        <Link href="/events">
+          <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-6
+            backdrop-blur-xl hover:bg-[var(--card-hover)] hover:scale-105 transition-all duration-300">
+            
+            <div className="flex justify-center mb-4">
+              <CalendarDays size={38} className="text-purple-400" />
             </div>
+            <h2 className="text-3xl font-bold">{eventCount}</h2>
+            <p className="text-[color:var(--foreground)] opacity-70">Événements à venir</p>
+          </div>
         </Link>
 
-        <div className="rounded-3xl p-6 backdrop-blur-xl bg-white/70 dark:bg-white/5 border border-gray-200
-        dark:border-white/10 shadow-xl dark:shadow-none transition hover:scale-105"
-        >
+        <div className="rounded-3xl p-6 backdrop-blur-xl bg-[var(--card-bg)] border border-[var(--card-border)]
+          shadow-xl transition hover:scale-105">
           <div className="flex justify-center mb-4">
             <Mic
               size={38}
@@ -76,16 +77,14 @@ export default async function HeroSection() {
           <h2 className="text-3xl font-bold">
             24
           </h2>
-          <p className="text-gray-600 dark:text-gray-400">
-            Sessions
+          <p className="text-[color:var(--foreground)] opacity-70">
+            Sessions en cours
           </p>
         </div>
 
         <Link href="/speakers">
 
-          <div className="rounded-3xl p-6 backdrop-blur-xl bg-white/70 dark:bg-white/5 border border-gray-200
-             dark:border-white/10 shadow-xl dark:shadow-none transition hover:scale-105">
-
+          <div className="rounded-3xl p-6 backdrop-blur-xl bg-[var(--card-bg)] border border-[var(--card-border)] shadow-xl transition hover:scale-105">
             <div className="flex justify-center mb-4">
               <Users
                 size={38}
@@ -97,7 +96,7 @@ export default async function HeroSection() {
               {speakerCount}
             </h2>
 
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-[color:var(--foreground)] opacity-70">
               Intervenants
             </p>
           </div>
