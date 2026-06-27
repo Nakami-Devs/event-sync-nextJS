@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {Calendar, MapPin, Mic} from "lucide-react";
 import {EventItem} from "@/types";
+import FavoriteButton from "./FavoriteButton";
 
 interface EventCardProps {
     event: EventItem;
@@ -9,8 +10,8 @@ interface EventCardProps {
 export default async function EventCard({event}: EventCardProps) {
     return (
         <Link href={`/Event/${event.id}`}>
-            <div className="flex flex-col gap-3 bg-[var(--card-bg)] border border-[var(--card-border)] border-t-6 border-t-purple-800 
-            border-t-linear-to-r backdrop-blur-xl hover:scale-105 hover:border-violet-400 transition-all duration-300 cursor-pointer h-full rounded-2xl p-5">
+            <div className="relative flex flex-col gap-3 bg-[var(--card-bg)] border border-[var(--card-border)] border-t-6 border-t-purple-800 
+                border-t-linear-to-r backdrop-blur-xl hover:scale-105 hover:border-violet-400 transition-all duration-300 cursor-pointer h-full rounded-2xl p-5">
                 <h1 className="text-2xl font-bold">{event.title}</h1>
                 <p>{event.description}</p>
                 <div className="flex items-center gap-1 text-[12px]">
@@ -27,6 +28,7 @@ export default async function EventCard({event}: EventCardProps) {
                         <p>{event.sessions.length} sessions</p>
                     </div>
                 </div>
+                <FavoriteButton eventId={event.id}/>
             </div>
         </Link>
 
