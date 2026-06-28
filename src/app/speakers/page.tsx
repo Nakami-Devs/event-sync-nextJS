@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import Navbar from '@/components/Navbar'
+import Navbar from '@/components/navbar/Navbar'
 import { ArrowLeft } from 'lucide-react'
 
 type Speaker = {
@@ -27,7 +27,7 @@ export default async function SpeakersPage() {
   const speakers = await getSpeakers()
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-[#0f172a] via-[#1e1b4b] to-[#020617] text-white p-8">
+    <main className="min-h-screen" style={{ background: "var(--page-gradient)",color: "var(--foreground)",}}>
       <Navbar />
 
       <div className="max-w-6xl mx-auto mt-12">

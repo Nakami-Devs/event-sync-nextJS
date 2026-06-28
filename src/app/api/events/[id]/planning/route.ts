@@ -45,7 +45,7 @@ export async function GET(
     
     const now = new Date()
     
-    const planningByRoom = sessions.reduce((acc, session) => {
+    const planningByRoom = sessions.reduce<Record<string, any[]>>((acc: Record<string, any[]>, session: any) => {
       const roomName = session.room.name
 
       if (!acc[roomName]) {
@@ -68,7 +68,7 @@ export async function GET(
     }, {} as Record<string, any[]>)
     
     Object.keys(planningByRoom).forEach((roomName) => {
-      planningByRoom[roomName].sort((a, b) => 
+      planningByRoom[roomName].sort((a: any, b: any) => 
         new Date(a.start_time).getTime() - new Date(b.start_time).getTime()
       )
     })
