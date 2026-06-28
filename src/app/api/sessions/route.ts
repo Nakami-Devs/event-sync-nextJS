@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         id_event,
         id_room,
         speakers: {
-          create: (speaker_ids ?? []).map((id: string) => ({ id }))
+          create: (speaker_ids ?? []).map((speakerId: string) => ({ id_speaker: speakerId }))
         }
       },
       include: {
@@ -41,21 +41,44 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-    const eventId = request.nextUrl.searchParams.get('eventId')
+  try{
+    const id_event = request.nextUrl.searchParams.get('id_event')
 
-    if (!eventId) {
+    if (!id_event) {
         return NextResponse.json(
-            { error: 'eventId query parameter is required' },
+            { error: 'id_event query parameter is required' },
             { status: 400 }
         )
     }
 
     const sessions = await prisma.session.findMany({
-        where: { id_event: eventId },
-        include: { room: true, speakers: { include: { speaker: true } } }
+        where: { id_event: id_event },
+        include: { room: true, speakers: { include: { speaker: true } } },
+        orderBy : {
+          start_time: 'asc'
+        }
     })
+
+    const transformedSessions = sessions.map((session: any) => ({
+      id: session.id,
+      title: session.title,
+      description: session.description,
+      start_time: session.start_time,
+      end_time: session.end_time,
+      id_event: session.id_event,
+      id_room: session.id_room,
+      speaker_ids: session.speakers.map((s: any) => s.id_speaker)
+    }))
     
-    const response = NextResponse.json(sessions)
-    response.headers.set('X-Total-Count', sessions.length.toString())
+    const response = NextResponse.json(transformedSessions)
+    response.headers.set('X-Total-Count', transformedSessions.length.toString())
     return response
+
+  } catch (error) {
+            console.error('Erreur GET /api/sessions:', error);
+        return NextResponse.json(
+            { error: 'Erreur interne du serveur' },
+            { status: 500 }
+        );
+  }
 }
