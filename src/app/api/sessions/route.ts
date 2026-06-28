@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         id_event,
         id_room,
         speakers: {
-          create: (speaker_ids ?? []).map((id: string) => ({ id }))
+          create: (speaker_ids ?? []).map((speakerId: string) => ({ id_speaker: speakerId }))
         }
       },
       include: {
@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  try{
     const id_event = request.nextUrl.searchParams.get('id_event')
 
     if (!id_event) {
@@ -52,10 +53,32 @@ export async function GET(request: NextRequest) {
 
     const sessions = await prisma.session.findMany({
         where: { id_event: id_event },
-        include: { room: true, speakers: { include: { speaker: true } } }
+        include: { room: true, speakers: { include: { speaker: true } } },
+        orderBy : {
+          start_time: 'asc'
+        }
     })
+
+    const transformedSessions = sessions.map((session: any) => ({
+      id: session.id,
+      title: session.title,
+      description: session.description,
+      start_time: session.start_time,
+      end_time: session.end_time,
+      id_event: session.id_event,
+      id_room: session.id_room,
+      speaker_ids: session.speakers.map((s: any) => s.id_speaker)
+    }))
     
-    const response = NextResponse.json(sessions)
-    response.headers.set('X-Total-Count', sessions.length.toString())
+    const response = NextResponse.json(transformedSessions)
+    response.headers.set('X-Total-Count', transformedSessions.length.toString())
     return response
+
+  } catch (error) {
+            console.error('Erreur GET /api/sessions:', error);
+        return NextResponse.json(
+            { error: 'Erreur interne du serveur' },
+            { status: 500 }
+        );
+  }
 }
