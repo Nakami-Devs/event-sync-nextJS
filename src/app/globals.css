@@ -2,18 +2,23 @@
 
 :root {
   color-scheme: light;
-  --background: #FAFAFA;
+  --background: #c8c8d8;
   --foreground: #111827;
   --hero-text: #111827;
-  --page-gradient: linear-gradient(to bottom right, #ffffff, #f8fafc, #eef2ff);
+  --page-gradient: linear-gradient(135deg, #b8b8d4 0%, #c4c0d8 30%, #bcc8d8 60%, #c0c4d0 100%);
 
-  --glass-bg: rgba(0, 0, 0, 0.05);
-  --glass-hover: rgba(0, 0, 0, 0.10);
-  --glass-border: rgba(0, 0, 0, 0.10);
+  --glass-bg: rgba(255, 255, 255, 0.25);
+  --glass-hover: rgba(255, 255, 255, 0.35);
+  --glass-border: rgba(255, 255, 255, 0.30);
 
-  --card-bg: rgba(0, 0, 0, 0.04);
-  --card-border: rgba(0, 0, 0, 0.10);
-  --card-hover: rgba(0, 0, 0, 0.08);
+  --card-bg: rgba(255, 255, 255, 0.20);
+  --card-border: rgba(255, 255, 255, 0.30);
+  --card-hover: rgba(255, 255, 255, 0.35);
+
+  --navbar-bg: rgba(255, 255, 255, 0.15);
+  --navbar-border: rgba(255, 255, 255, 0.20);
+  --nav-text: #1a1a2e;
+  --brand-text: #6d5fd4;
 }
 
 html.dark {
@@ -30,10 +35,13 @@ html.dark {
   --card-bg: rgba(255, 255, 255, 0.05);
   --card-border: rgba(255, 255, 255, 0.10);
   --card-hover: rgba(255, 255, 255, 0.10);
+  --nav-text: #e2e8f0;
+  --brand-text: #ffffff;
 }
 
 body {
-  background: var(--background);
+  background: var(--page-gradient);
+  min-height: 100vh;
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
