@@ -17,8 +17,8 @@ export async function POST(request: NextRequest) {
       data: {
         title,
         description,
-        start_time: new Date(start_time),   
-        end_time:   new Date(end_time),
+        start_time: new Date(start_time),
+        end_time: new Date(end_time),
         id_event,
         id_room,
         speakers: {
@@ -27,8 +27,8 @@ export async function POST(request: NextRequest) {
       },
       include: {
         speakers: { include: { speaker: true } },
-        room:     true,
-        event:    true
+        room: true,
+        event: true
       }
     })
 
@@ -41,22 +41,22 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  try{
+  try {
     const id_event = request.nextUrl.searchParams.get('id_event')
 
     if (!id_event) {
-        return NextResponse.json(
-            { error: 'id_event query parameter is required' },
-            { status: 400 }
-        )
+      return NextResponse.json(
+        { error: 'id_event query parameter is required' },
+        { status: 400 }
+      )
     }
 
     const sessions = await prisma.session.findMany({
-        where: { id_event: id_event },
-        include: { room: true, speakers: { include: { speaker: true } } },
-        orderBy : {
-          start_time: 'asc'
-        }
+      where: { id_event: id_event },
+      include: { room: true, speakers: { include: { speaker: true } } },
+      orderBy: {
+        start_time: 'asc'
+      }
     })
 
     const transformedSessions = sessions.map((session: any) => ({
@@ -67,18 +67,23 @@ export async function GET(request: NextRequest) {
       end_time: session.end_time,
       id_event: session.id_event,
       id_room: session.id_room,
+      room_name: session.room.name,
+      speakers: session.speakers.map((s: any) => ({
+        id: s.id_speaker,
+        full_name: s.speaker.full_name,
+      })),
       speaker_ids: session.speakers.map((s: any) => s.id_speaker)
     }))
-    
+
     const response = NextResponse.json(transformedSessions)
     response.headers.set('X-Total-Count', transformedSessions.length.toString())
     return response
 
   } catch (error) {
-            console.error('Erreur GET /api/sessions:', error);
-        return NextResponse.json(
-            { error: 'Erreur interne du serveur' },
-            { status: 500 }
-        );
+    console.error('Erreur GET /api/sessions:', error);
+    return NextResponse.json(
+      { error: 'Erreur interne du serveur' },
+      { status: 500 }
+    );
   }
 }
