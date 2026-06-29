@@ -1,4 +1,4 @@
-import { Mic } from "lucide-react"
+import { Mic, ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import SessionCard from "@/components/planning/SessionCard"
 
@@ -26,9 +26,14 @@ export default async function LiveSessionsPage() {
   const sessions = await getLiveSessions()
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-12">
-        
+    <div className="max-w-5xl mx-auto px-8 py-12">
       <div className="flex items-center gap-3 mb-8">
+        <Link href="/" className="inline-flex items-center justify-center w-9 h-9 rounded-full mt-1
+            bg-[var(--card-bg)] border border-[var(--card-border)] hover:border-purple-400/50
+            hover:bg-[var(--card-hover)] transition-all duration-200">
+          <ArrowLeft size={18} className="text-gray-400" />
+        </Link>
+
         <div className="relative">
           <Mic size={28} className="text-cyan-400" />
           {sessions.length > 0 && (
@@ -52,17 +57,22 @@ export default async function LiveSessionsPage() {
           </Link>
         </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {sessions.map((session) => (
             <Link href={`/sessions/${session.id}`} key={session.id}>
-              <SessionCard
-                title={session.title}
-                start={session.start_time}
-                end={session.end_time}
-                room={session.room?.name}
-                speaker={session.speakers.map(s => s.speaker?.full_name ?? "")}
-                isLive={true}
-              />
+              <div className="rounded-2xl border border-purple-500/20 hover:border-cyan-400/50
+                bg-[var(--card-bg)] backdrop-blur-xl hover:bg-[var(--card-hover)]
+                hover:scale-[1.03] hover:shadow-lg hover:shadow-cyan-500/10
+                transition-all duration-300 cursor-pointer">
+                <SessionCard
+                  title={session.title}
+                  start={session.start_time}
+                  end={session.end_time}
+                  room={session.room?.name}
+                  speaker={session.speakers.map(s => s.speaker?.full_name ?? "")}
+                  isLive={true}
+                />
+              </div>
             </Link>
           ))}
         </div>
