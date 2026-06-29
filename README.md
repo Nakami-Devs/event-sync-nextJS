@@ -1,36 +1,174 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EventSync
 
-## Getting Started
+## Description
 
-First, run the development server:
+EventSync est une plateforme de gestion d'événements développée avec Next.js. Elle permet aux utilisateurs de consulter les événements disponibles, de découvrir les intervenants (speakers), de consulter les sessions et de s'inscrire aux événements. Une interface d'administration permet également de gérer les événements, les utilisateurs, les speakers, les sessions et les inscriptions.
+
+---
+
+## Technologies utilisées
+
+### Front-end
+- Next.js
+- React
+- TypeScript
+- Tailwind CSS
+
+### Back-end
+- Node.js
+- TypeScript
+- API REST
+
+### Base de données
+- PostgreSQL
+
+### Outils
+- Git
+- GitHub
+
+---
+
+## Fonctionnalités
+
+### Espace utilisateur
+- Consulter la liste des événements
+- Voir les détails d'un événement
+- Consulter les speakers
+- Voir les sessions d'un événement
+- S'inscrire à un événement
+- Authentification des utilisateurs
+
+### Espace administrateur
+- Gestion des événements
+- Gestion des speakers
+- Gestion des sessions
+- Gestion des utilisateurs
+- Gestion des inscriptions
+
+---
+
+## Installation
+
+### 1. Cloner le projet
+
+```bash
+git clone https://github.com/votre-organisation/eventsync.git
+```
+
+### 2. Accéder au dossier du projet
+
+```bash
+cd eventsync
+```
+
+### 3. Installer les dépendances
+
+```bash
+npm install
+```
+
+### 4. Configurer les variables d'environnement
+
+Créer un fichier `.env` à la racine du projet.
+
+Exemple :
+
+```env
+DATABASE_URL=postgresql://username:password@localhost:5432/eventsync
+
+JWT_SECRET=your_secret
+
+NEXT_PUBLIC_API_URL=http://localhost:3000
+```
+
+### 5. Démarrer PostgreSQL
+
+Assurez-vous que PostgreSQL est installé, lancé et que la base de données est créée.
+
+### 6. Lancer le projet
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Le projet sera accessible à l'adresse :
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
+## Structure du projet
 
-To learn more about Next.js, take a look at the following resources:
+```text
+eventsync/
+├── app/
+├── components/
+├── public/
+├── lib/
+├── types/
+├── pages/
+├── styles/
+└── ...
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Contributeurs
 
-## Deploy on Vercel
+| Nom | Contribution |
+|------|--------------|
+| Nelio | Développement Front-end et Back-end |
+| Fanamby | Développement Front-end et Back-end |
+| Finoana | Développement Front-end et Back-end |
+| Koloina | Développement Front-end et Back-end |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Chaque membre de l'équipe a participé au développement de la partie utilisateur ainsi qu'à certaines fonctionnalités de l'interface d'administration.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+## Stack technique
+
+- Next.js
+- React
+- TypeScript
+- Node.js
+- PostgreSQL
+- Tailwind CSS
+- Git
+- GitHub
+
+---
+
+## Commandes utiles
+
+Installer les dépendances :
+
+```bash
+npm install
+```
+
+Lancer le projet en mode développement :
+
+```bash
+npm run dev
+```
+
+Construire le projet :
+
+```bash
+npm run build
+```
+
+Lancer la version de production :
+
+```bash
+npm start
+```
+
+---
+
+## Licence
+
+Projet réalisé dans le cadre d'un projet académique.
