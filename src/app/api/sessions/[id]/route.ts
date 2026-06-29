@@ -28,7 +28,26 @@ export async function GET(
     const now    = new Date()
     const isLive = now >= session.start_time && now <= session.end_time
 
-    return NextResponse.json({ ...session, is_live: isLive }, { status: 200 })
+    const transformedSession = {
+      id: session.id,
+      title: session.title,
+      description: session.description,
+      start_time: session.start_time,
+      end_time: session.end_time,
+      id_event: session.id_event,
+      id_room: session.id_room,
+      room_name: session.room?.name ?? null,
+      capacity: session.room?.capacity ?? null,
+      speakers: session.speakers.map(s => ({
+        id: s.id_speaker,
+        full_name: s.speaker.full_name,
+      })),
+      speaker_ids: session.speakers.map(s => s.id_speaker),
+      is_live: isLive,
+      questions: session.questions,
+    }
+
+    return NextResponse.json(transformedSession, { status: 200 })
 
   } catch (error) {
     console.error(error)
