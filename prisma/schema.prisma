@@ -39,6 +39,7 @@ model Event {
   end_date    DateTime
   place       String
   sessions    Session[]
+  favorites Favorite[]
 
   @@map("event")
 }
@@ -88,4 +89,11 @@ model SessionSpeaker {
 
   @@id([id_speaker, id_session])
   @@map("session_speaker")
+}
+
+model Favorite {
+  id        String   @id @default(cuid())
+  eventId   String   @unique
+  createdAt DateTime @default(now())
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
 }

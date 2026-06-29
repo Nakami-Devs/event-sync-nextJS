@@ -12,7 +12,15 @@ export async function middleware(req: NextRequest){
         (req.nextUrl.pathname.startsWith('/api/rooms') && req.method !== 'GET')
 
     if(isAdminRoute && !isLoginRoute){
-        const token = await getToken({ req, secret: process.env.AUTH_SECRET });
+        const secret = process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET
+        if (!secret) {
+            return NextResponse.json(
+                { message: 'Accès non autorisé'},
+                { status: 401 }
+            )
+        }
+
+        const token = await getToken({ req, secret });
         if(!token){
             return NextResponse.json(
                 { message: 'Accès non autorisé'},

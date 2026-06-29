@@ -22,7 +22,7 @@ export async function GET(
     })
 
     const now = new Date()
-    const sessionsWithLive = sessions.map((session) => ({
+    const sessionsWithLive = sessions.map((session: any) => ({
       ...session,
       is_live: now >= session.start_time && now <= session.end_time
     }))
