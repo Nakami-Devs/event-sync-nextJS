@@ -1,26 +1,71 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: light;
+  --background: #c8c8d8;
+  --foreground: #111827;
+  --hero-text: #111827;
+  --page-gradient: linear-gradient(135deg, #b8b8d4 0%, #c4c0d8 30%, #bcc8d8 60%, #c0c4d0 100%);
+
+  --glass-bg: rgba(255, 255, 255, 0.25);
+  --glass-hover: rgba(255, 255, 255, 0.35);
+  --glass-border: rgba(255, 255, 255, 0.30);
+
+  --card-bg: rgba(255, 255, 255, 0.20);
+  --card-border: rgba(255, 255, 255, 0.30);
+  --card-hover: rgba(255, 255, 255, 0.35);
+
+  --navbar-bg: rgba(255, 255, 255, 0.15);
+  --navbar-border: rgba(255, 255, 255, 0.20);
+  --nav-text: #1a1a2e;
+  --brand-text: #6d5fd4;
+
+  --badge-violet-bg: rgba(139, 92, 246, 0.18);
+  --badge-violet-text: #5b21b6;
+  --badge-blue-bg: rgba(99, 102, 241, 0.15);
+  --badge-blue-text: #1e40af;
+  --link-bg: rgba(139, 92, 246, 0.18);
+  --link-text: #5b21b6;
+  --link-hover-bg: rgba(139, 92, 246, 0.30);
+
+  --font-poppins: 'Poppins', sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+html.dark {
+  color-scheme: dark;
+  --background: #1e0841;
+  --foreground: #FAFAFA;
+  --hero-text: #ffffff;
+  --page-gradient: linear-gradient(to bottom right, #0f172a, #1e1b4b, #020617);
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --glass-bg: rgba(255, 255, 255, 0.10);
+  --glass-hover: rgba(255, 255, 255, 0.20);
+  --glass-border: rgba(255, 255, 255, 0.10);
+
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --card-border: rgba(255, 255, 255, 0.10);
+  --card-hover: rgba(255, 255, 255, 0.10);
+  --nav-text: #e2e8f0;
+  --brand-text: #ffffff;
+
+  --badge-violet-bg: rgba(139, 92, 246, 0.35);
+  --badge-violet-text: #c4b5fd;
+  --badge-blue-bg: rgba(96, 165, 250, 0.30);
+  --badge-blue-text: #93c5fd;
+  --link-bg: rgba(139, 92, 246, 0.35);
+  --link-text: #c4b5fd;
+  --link-hover-bg: rgba(139, 92, 246, 0.50);
 }
 
 body {
-  background: var(--background);
+  min-height: 100vh;
+  background: var(--page-gradient);
+  background-attachment: fixed;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-poppins);
+}
+
+::selection {
+  background-color: rgb(79 70 229 / 0.35);
 }
