@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -27,6 +28,8 @@
   --link-bg: rgba(139, 92, 246, 0.18);
   --link-text: #5b21b6;
   --link-hover-bg: rgba(139, 92, 246, 0.30);
+
+  --font-poppins: 'Poppins', sans-serif;
 }
 
 html.dark {
@@ -60,7 +63,7 @@ body {
   background: var(--page-gradient);
   background-attachment: fixed;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-poppins);
 }
 
 ::selection {
