@@ -1,12 +1,10 @@
-import { CalendarDays, Mic, Users } from "lucide-react"
+import { CalendarDays, Users } from "lucide-react"
 import Link from "next/link"
-
+import LiveSessionsCard from "@/components/sections/LiveSessionsCard"
 
 async function getSpeakerCount(): Promise<number> {
   try {
-    const res = await fetch('http://localhost:3000/api/speakers', {
-      cache: 'no-store'
-    })
+    const res = await fetch('http://localhost:3000/api/speakers', { cache: 'no-store' })
     if (!res.ok) return 0
     const data = await res.json()
     return Array.isArray(data) ? data.length : 0
@@ -17,9 +15,7 @@ async function getSpeakerCount(): Promise<number> {
 
 async function getEventCount(): Promise<number> {
   try {
-    const res = await fetch('http://localhost:3000/api/events', {
-      cache: 'no-store'
-    })
+    const res = await fetch('http://localhost:3000/api/events', { cache: 'no-store' })
     if (!res.ok) return 0
     const data = await res.json()
     return Array.isArray(data) ? data.length : 0
@@ -40,8 +36,7 @@ export default async function HeroSection() {
       </div>
 
       <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold max-w-5xl leading-tight">
-        <p
-          className="bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">
+        <p className="bg-gradient-to-r from-purple-500 to-blue-500 bg-clip-text text-transparent">
           EventSync
         </p>
         <p style={{ color: "var(--hero-text)" }}>
@@ -57,7 +52,6 @@ export default async function HeroSection() {
         <Link href="/events">
           <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-6
             backdrop-blur-xl hover:bg-[var(--card-hover)] hover:scale-105 transition-all duration-300">
-
             <div className="flex justify-center mb-4">
               <CalendarDays size={38} className="text-purple-400" />
             </div>
@@ -66,39 +60,15 @@ export default async function HeroSection() {
           </div>
         </Link>
 
-        <div className="rounded-3xl p-6 backdrop-blur-xl bg-[var(--card-bg)] border border-[var(--card-border)]
-          shadow-xl transition hover:scale-105">
-          <div className="flex justify-center mb-4">
-            <Mic
-              size={38}
-              className="text-cyan-500"
-            />
-          </div>
-          <h2 className="text-3xl font-bold">
-            24
-          </h2>
-          <p className="text-[color:var(--foreground)] opacity-70">
-            Sessions en cours
-          </p>
-        </div>
+        <LiveSessionsCard />
 
         <Link href="/speakers">
-
           <div className="rounded-3xl p-6 backdrop-blur-xl bg-[var(--card-bg)] border border-[var(--card-border)] shadow-xl transition hover:scale-105">
             <div className="flex justify-center mb-4">
-              <Users
-                size={38}
-                className="text-blue-500"
-              />
+              <Users size={38} className="text-blue-500" />
             </div>
-
-            <h2 className="text-3xl font-bold">
-              {speakerCount}
-            </h2>
-
-            <p className="text-[color:var(--foreground)] opacity-70">
-              Intervenants
-            </p>
+            <h2 className="text-3xl font-bold">{speakerCount}</h2>
+            <p className="text-[color:var(--foreground)] opacity-70">Intervenants</p>
           </div>
         </Link>
       </div>
