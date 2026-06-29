@@ -75,43 +75,60 @@ export default async function SessionDetailPage({
   const status = getSessionStatus(session.start_time, session.end_time)
 
   return (
-    <main className="min-h-screen bg-[#12132A] text-white">
-      <div className="max-w-4xl mx-auto px-6 py-8">
-
-        {status === 'live' && (
+  <main className="min-h-screen text-[var(--foreground)]">
+    <div className="max-w-5xl mx-auto px-6 py-10">
+      <div
+        className="
+          rounded-3xl
+          border
+          border-[var(--card-border)]
+          bg-[var(--card-bg)]
+          backdrop-blur-xl
+          p-8
+          shadow-xl
+        "
+      >
+        {status === "live" && (
           <span className="inline-flex items-center gap-1.5 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-4">
             <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
             LIVE
           </span>
         )}
-        {status === 'termine' && (
+
+        {status === "termine" && (
           <span className="inline-flex items-center gap-1.5 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-4">
             Terminée
           </span>
         )}
-        {status === 'a_venir' && (
+
+        {status === "a_venir" && (
           <span className="inline-flex items-center gap-1.5 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-4">
             À venir
           </span>
         )}
 
-        <h1 className="text-4xl font-bold text-white mb-4">{session.title}</h1>
+        <h1 className="text-4xl font-bold text-[var(--foreground)] mb-4">
+          {session.title}
+        </h1>
 
-        <div className="flex flex-wrap items-center gap-4 text-sm text-gray-300 mb-2">
+        <div className="flex flex-wrap items-center gap-4 text-sm text-[color:var(--foreground)]/70 mb-2">
           <span className="flex items-center gap-1.5">
             <Calendar size={14} className="text-purple-400" />
             {formatDate(session.start_time)}
           </span>
+
           <span className="flex items-center gap-1.5">
             <Clock size={14} className="text-cyan-400" />
             {formatTime(session.start_time)} — {formatTime(session.end_time)}
           </span>
+
           {session.room && (
             <span className="flex items-center gap-1.5">
               <MapPin size={14} className="text-blue-400" />
               {session.room.name}
             </span>
           )}
+
           {session.room?.capacity && (
             <span className="flex items-center gap-1.5">
               <Users size={14} className="text-green-400" />
@@ -121,39 +138,71 @@ export default async function SessionDetailPage({
         </div>
 
         {session.event && (
-          <p className="text-gray-500 text-xs mb-8">
+          <p className="text-[color:var(--foreground)]/60 text-xs mb-8">
             Événement : {session.event.title}
           </p>
         )}
 
-        <hr className="border-white/10 mb-8" />
+        <hr className="border-[var(--card-border)] mb-8" />
 
         <div className="mb-8">
-          <h2 className="text-lg font-bold text-white mb-2">Description</h2>
-          <p className="text-gray-400 leading-relaxed">{session.description}</p>
+          <h2 className="text-lg font-bold text-[var(--foreground)] mb-2">
+            Description
+          </h2>
+
+          <p className="text-[color:var(--foreground)]/70 leading-relaxed">
+            {session.description}
+          </p>
         </div>
 
         {session.speakers.length > 0 && (
           <div className="mb-8">
-            <h2 className="text-lg font-bold text-white mb-4">Intervenants</h2>
-            <div className="flex flex-col gap-3">
+            <h2 className="text-lg font-bold text-[var(--foreground)] mb-4">
+              Intervenants
+            </h2>
+
+            <div className="flex flex-col gap-4">
               {session.speakers.map(({ speaker }, index) => {
-                if (!speaker) return null
+                if (!speaker) return null;
+
                 return (
-                  <div key={speaker.id ?? index} className="flex items-center gap-4 bg-white/5 rounded-xl px-4 py-3">
+                  <div
+                    key={speaker.id ?? index}
+                    className="
+                      flex
+                      items-center
+                      gap-4
+                      rounded-2xl
+                      border
+                      border-[var(--card-border)]
+                      bg-[var(--card-bg)]
+                      backdrop-blur-xl
+                      px-4
+                      py-4
+                      transition-all
+                      duration-300
+                      hover:bg-[var(--card-hover)]
+                    "
+                  >
                     <Image
-                      src={speaker.profile_pic || '/placeholder.png'}
+                      src={speaker.profile_pic || "/placeholder.png"}
                       alt={speaker.full_name}
-                      width={44}
-                      height={44}
+                      width={48}
+                      height={48}
                       className="rounded-full object-cover"
                     />
+
                     <div>
-                      <p className="font-semibold text-white">{speaker.full_name}</p>
-                      <p className="text-sm text-gray-400">{speaker.biography}</p>
+                      <p className="font-semibold text-[var(--foreground)]">
+                        {speaker.full_name}
+                      </p>
+
+                      <p className="text-sm text-[color:var(--foreground)]/65">
+                        {speaker.biography}
+                      </p>
                     </div>
                   </div>
-                )
+                );
               })}
             </div>
           </div>
@@ -165,12 +214,11 @@ export default async function SessionDetailPage({
             initialQuestions={session.questions}
           />
         ) : (
-          <p className="text-gray-500 text-sm text-center py-8">
+          <p className="text-[color:var(--foreground)]/60 text-sm text-center py-8">
             Les questions seront disponibles pendant la session.
           </p>
         )}
-
       </div>
-    </main>
-  )
-}
+    </div>
+  </main>
+)};
