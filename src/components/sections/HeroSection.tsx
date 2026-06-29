@@ -34,8 +34,8 @@ export default async function HeroSection() {
 
   return (
     <section className="min-h-[80vh] flex flex-col items-center justify-center text-center px-4 sm:px-6">
-      <div className="mb-6 px-4 py-2 rounded-full bg-purple-100/50 dark:bg-purple-500/10 border border-purple-200 
-      dark:border-purple-500/20 backdrop-blur text-purple-100 dark:text-purple-400">
+      <div className="mb-6 px-4 py-2 rounded-full bg-white/30 dark:bg-purple-500/10 border border-white/50 dark:border-purple-500/20
+        backdrop-blur text-purple-700 dark:text-purple-400 dark:border-purple-500/20 backdrop-blur text-purple-100 dark:text-purple-400">
         Plateforme d'événements en temps réel
       </div>
 
@@ -57,7 +57,7 @@ export default async function HeroSection() {
         <Link href="/events">
           <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-6
             backdrop-blur-xl hover:bg-[var(--card-hover)] hover:scale-105 transition-all duration-300">
-            
+
             <div className="flex justify-center mb-4">
               <CalendarDays size={38} className="text-purple-400" />
             </div>

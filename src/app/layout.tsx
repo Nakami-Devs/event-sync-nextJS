@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import ThemeProvider from "@/components/navbar/ThemeProvider";
+import Navbar from "@/components/navbar/Navbar";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -27,15 +28,25 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable}`}
     >
+
       <body className="min-h-screen transition-colors duration-300">
+
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
           enableSystem={false}
         >
-          {children}
+
+          <Navbar />
+
+          <main className="pt-20">
+            {children}
+          </main>
+
         </ThemeProvider>
+
       </body>
+
     </html>
   );
 }
