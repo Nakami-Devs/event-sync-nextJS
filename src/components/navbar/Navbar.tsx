@@ -33,7 +33,7 @@ export default function Navbar() {
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
         <Link href="/" className="flex items-center gap-3">
-            <div className="w-14 h-14 rounded-full bg-white p-[3px] shadow-lg">
+            <div className="w-12 h-12 rounded-full bg-white p-[1px] shadow-lg">
               <Image
               src="/EventSync_logo.png"
               alt="EventSync Logo"
