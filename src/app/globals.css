@@ -59,8 +59,9 @@ html.dark {
 }
 
 body {
-  background: var(--page-gradient);
   min-height: 100vh;
+  background: var(--page-gradient);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-poppins);
 }

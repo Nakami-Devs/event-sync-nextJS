@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image"
 import ThemeToggle from "./ThemeToggle";
 import {
   Calendar,
@@ -31,28 +32,20 @@ export default function Navbar() {
       "
     >
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        <Link
-          href="/"
-          className="flex items-center gap-2 font-bold text-lg hover:opacity-80 transition"
-        >
-          <span
-            className="
-              flex h-8 w-8 items-center justify-center
-              rounded-lg
-              bg-gradient-to-br
-              from-purple-500
-              to-blue-400
-              text-white
-              text-sm
-            "
-          >
-            ⚡
-          </span>
+        <Link href="/" className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-white p-[1px] shadow-lg">
+              <Image
+              src="/EventSync_logo.png"
+              alt="EventSync Logo"
+              width={56}
+              height={56} 
+              className="w-full h-full rounded-full object-cover"
+              priority
+              />
+            </div>
 
-          <span style={{ color: "var(--brand-text)" }}>
-            EventSync
-          </span>
-        </Link>
+        <span className="font-bold text-lg">EventSync</span>
+      </Link>
 
         <div className="hidden md:flex items-center gap-2">
           <Link
